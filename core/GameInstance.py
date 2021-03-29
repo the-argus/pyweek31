@@ -2,6 +2,7 @@ import arcade
 import math
 
 from constants.game import SCREEN_WIDTH, SCREEN_HEIGHT
+from core.GameResource import GameResources
 
 class GameInstance:
     """
@@ -16,32 +17,26 @@ class GameInstance:
         self.horizontal_key_list = []
         self.verticle_key_list = []
 
+        self.game_resources = GameResources(self)
+
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
-        #toggle fullscreen
-        if key == arcade.key.F:
-            self.window.set_fullscreen(not self.window.fullscreen)
-            if self.window.fullscreen:
-                if SCREEN_WIDTH > SCREEN_HEIGHT:
-                    self.window.screensize_multiplier = self.screensize[0]/SCREEN_WIDTH
-                else:
-                    self.window.screensize_multiplier = self.screensize[1]/SCREEN_HEIGHT
-            else:
-                self.window.set_size(self.window.original_size[0],self.window.original_size[1])
-                self.window.screensize_multiplier = 1
+        self.game_resources.player_sprite.on_key_press(key, modifiers)
+        self.game_resources.on_key_press(key, modifiers)
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
-        pass
+        self.game_resources.player_sprite.on_key_release(key, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
-        pass
+        self.game_resources.player_sprite.on_mouse_motion(x, y, dx, dy)
 
     def on_mouse_press(self, x, y, button, modifiers):
-        pass
+        self.game_resources.player_sprite.on_mouse_press(x, y, button, modifiers)
 
     def on_draw(self):
-        pass
+        self.game_resources.on_draw()
+
     def on_draw_scene(self):
         pass
 
@@ -56,4 +51,4 @@ class GameInstance:
 
     def on_update(self, delta_time):
         """ Movement and game logic """
-        pass
+        self.game_resources.on_update(delta_time)
