@@ -67,6 +67,10 @@ class PlayerCharacter(arcade.Sprite):
             self.right_pressed = False
 
     def on_update(self, delta_time):
+        #failsafe cordinates in case we need to revert changes
+        failsafe_x = self.center_x
+        failsafe_y = self.center_y
+
         #physics stuff, just take direction from pressed keys and convert to x and y of pressed_force and drag vector
         in_x = ((self.right_pressed)-(self.left_pressed))
         in_y = ((self.up_pressed)-(self.down_pressed))
@@ -110,6 +114,9 @@ class PlayerCharacter(arcade.Sprite):
                     break
             self.center_y += test_y
 
+        if collision_check(self,self.center_x,self.center_y,self.game_resources.wall_list):
+            self.center_x = failsafe_x
+            self.center_y = failsafe_y
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png",self.scale)
