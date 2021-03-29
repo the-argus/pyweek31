@@ -1,6 +1,7 @@
 import arcade
 
-def collision_check(sprite,new_x,new_y,wall_list):
+
+def collision_check(sprite, new_x, new_y, wall_list):
     original_hit_box = sprite.get_hit_box()
     hit_box = [list(num) for num in list(original_hit_box)]
 

@@ -1,7 +1,8 @@
 import arcade
 import math
 
-def lerp(start,end,ratio):
+
+def lerp(start, end, ratio):
     compare = (start-end)
     if compare == 0:
         return start
