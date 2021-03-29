@@ -70,6 +70,8 @@ class GameResources:
 
     def on_update(self, delta_time):
         #camera scrolling
+        self.follow_x = self.player_sprite.center_x
+        self.follow_y = self.player_sprite.center_y
         dist = math.sqrt(((self.view_left+(SCREEN_WIDTH/2)) - self.follow_x)**2 + ((self.view_bottom+(SCREEN_HEIGHT/2)) - self.follow_y)**2)
         if (dist >= LERP_MARGIN):
             self.view_left = int(lerp(self.view_left,self.follow_x-(SCREEN_WIDTH/2),LERP_SPEED))
@@ -90,10 +92,15 @@ class GameResources:
             self.view_left+self.shake_x,
             (SCREEN_WIDTH) + self.view_left+self.shake_x,
             self.view_bottom+self.shake_y,
-            (SCREEN_HEIGHT) + self.view_bottom+self.shake_y,
+            (SCREEN_HEIGHT) + self.view_bottom+self.shake_y
         )
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.F:
-            self.game_instance.set_fullscreen(not self.game_instance.fullscreen)
-            self.game_instance.set_viewport(self.follow_x-(SCREEN_WIDTH/2),self.follow_x+(SCREEN_WIDTH/2),self.follow_y-(SCREEN_HEIGHT/2),self.follow_y+(SCREEN_HEIGHT/2))
+            self.game_instance.window.set_fullscreen(not self.game_instance.window.fullscreen)
+            arcade.set_viewport(
+                self.view_left+self.shake_x,
+                self.view_left+self.shake_x+SCREEN_WIDTH,
+                self.view_bottom+self.shake_y,
+                self.view_bottom+self.shake_y+SCREEN_HEIGHT
+            )

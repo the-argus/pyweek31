@@ -1,3 +1,4 @@
+import arcade
 import sys
 import os
 
@@ -8,8 +9,6 @@ if sys.version_info[:2] < MIN_VER:
     sys.exit(
         "This game requires Python {}.{}.".format(*MIN_VER)
     )
-
-import arcade
 
 from constants.game import SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE
 from core.GameInstance import GameInstance
