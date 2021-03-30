@@ -14,6 +14,8 @@ from constants.game import (
 from constants.camera import LERP_MARGIN, LERP_SPEED, FOLLOW, IDLE
 from core.lerp import lerp
 from core.PlayerCharacter import PlayerCharacter
+from core.Enemies import Enemy
+
 
 
 class GameResources:
@@ -49,13 +51,18 @@ class GameResources:
         )  # contains all static objects which should have collision
         self.floor_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
+        self.enemy_list = arcade.SpriteList()
 
         # player
         self.player_sprite = PlayerCharacter(PLAYER_DEFAULT_START, self)
         self.player_list.append(self.player_sprite)
 
+        # enemies
+        for i in range(10):
+            self.spawn_new_enemy()
+
         # placeholder room
-        for i in range(int(ROOM_HEIGHT / 16)):
+        for i in range(int(ROOM_HEIGHT/16)):
             wall1 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall2 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall1.center_x = 8
@@ -79,6 +86,7 @@ class GameResources:
         # draw all the lists
         self.wall_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        self.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
 
     def on_update(self, delta_time):
         # camera scrolling
@@ -125,3 +133,19 @@ class GameResources:
                 self.view_bottom + self.shake_y,
                 self.view_bottom + self.shake_y + SCREEN_HEIGHT,
             )
+
+    def spawn_new_enemy(self):
+        start_x = random.randint(0, ROOM_WIDTH)
+        start_y = random.randint(0, ROOM_HEIGHT)
+        flag = True
+        self.enemy_sprite = Enemy((start_x, start_y), self)
+        for wall in self.wall_list:
+            if arcade.check_for_collision(self.enemy_sprite, wall):
+                flag = False
+        if self.calculate_distance_from_player(start_x, start_y) > SPAWN_RADIUS and flag:
+            self.enemy_list.append(self.enemy_sprite)
+
+    def calculate_distance_from_player(self, enemy_x, enemy_y):
+        player_x = self.player_sprite.center_x
+        player_y = self.player_sprite.center_y
+        return math.sqrt(abs(enemy_x - player_x) ** 2 + abs(enemy_y - player_y) ** 2)

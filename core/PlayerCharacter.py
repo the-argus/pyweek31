@@ -68,13 +68,13 @@ class PlayerCharacter(arcade.Sprite):
             self.right_pressed = False
 
     def on_update(self, delta_time):
-        # failsafe cordinates in case we need to revert changes
+        # failsafe coordinates in case we need to revert changes
         failsafe_x = self.center_x
         failsafe_y = self.center_y
 
         # physics stuff, just take direction from pressed keys and convert to x and y of pressed_force and drag vector
-        in_x = (self.right_pressed) - (self.left_pressed)
-        in_y = (self.up_pressed) - (self.down_pressed)
+        in_x = self.right_pressed-self.left_pressed
+        in_y = self.up_pressed-self.down_pressed
         is_moving = True
         if not in_x and not in_y:
             is_moving = False

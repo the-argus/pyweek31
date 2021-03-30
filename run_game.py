@@ -81,16 +81,6 @@ class GameWindow(arcade.Window):
         )
 
 
-def main():
-    """ Main method """
-    window = GameWindow(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-    window.setup()
-    arcade.run()
-
-
-if __name__ == "__main__":
-    main()
-
 
 def load_texture_pair(filename):
     """
