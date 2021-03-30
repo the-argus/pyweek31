@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import arcade
 import sys
 import os
