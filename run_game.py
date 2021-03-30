@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import arcade
 import sys
 import os
@@ -6,9 +7,7 @@ import os
 MIN_VER = (3, 7)
 
 if sys.version_info[:2] < MIN_VER:
-    sys.exit(
-        "This game requires Python {}.{}.".format(*MIN_VER)
-    )
+    sys.exit("This game requires Python {}.{}.".format(*MIN_VER))
 
 from constants.game import SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE
 from core.GameInstance import GameInstance
@@ -50,16 +49,16 @@ class GameWindow(arcade.Window):
 
     def on_mouse_motion(self, x, y, dx, dy):
         """passes mouse info to the gameinstance on_mouse_motion but properly scaled to any screensize changes"""
-        scaledx = (x/self.screensize_multiplier)
-        scaledy = (y/self.screensize_multiplier)
-        scaleddx = (dx/self.screensize_multiplier)
-        scaleddy = (dy/self.screensize_multiplier)
+        scaledx = x / self.screensize_multiplier
+        scaledy = y / self.screensize_multiplier
+        scaleddx = dx / self.screensize_multiplier
+        scaleddy = dy / self.screensize_multiplier
         self.game_instance.on_mouse_motion(scaledx, scaledy, dx, dy)
 
     def on_mouse_press(self, x, y, button, modifiers):
         """passes mouse info to the gameinstance on_mouse_press but properly scaled to any screensize changes"""
-        scaledx = (x/self.screensize_multiplier)
-        scaledy = (y/self.screensize_multiplier)
+        scaledx = x / self.screensize_multiplier
+        scaledy = y / self.screensize_multiplier
         self.game_instance.on_mouse_press(scaledx, scaledy, button, modifiers)
 
     def on_update(self, delta_time):
@@ -72,7 +71,15 @@ class GameWindow(arcade.Window):
         self.game_instance.on_draw()
         text_size = 10
         margin = 2
-        arcade.draw_text("Press F to toggle between full screen and windowed mode", (SCREEN_WIDTH // 2) + self.game_instance.game_resources.view_left, margin + self.game_instance.game_resources.view_bottom,arcade.color.WHITE, text_size, anchor_x="center")
+        arcade.draw_text(
+            "Press F to toggle between full screen and windowed mode",
+            (SCREEN_WIDTH // 2) + self.game_instance.game_resources.view_left,
+            margin + self.game_instance.game_resources.view_bottom,
+            arcade.color.WHITE,
+            text_size,
+            anchor_x="center",
+        )
+
 
 
 def load_texture_pair(filename):

@@ -83,39 +83,61 @@ class PlayerCharacter(arcade.Sprite):
         f_x = math.cos(dir) * self.press_force * is_moving
         f_y = math.sin(dir) * self.press_force * is_moving
 
-        drag_x = sign(self.x_vel) * (self.x_vel**2) * self.drag_constant
-        drag_y = sign(self.y_vel) * (self.y_vel**2) * self.drag_constant
+        drag_x = sign(self.x_vel) * (self.x_vel ** 2) * self.drag_constant
+        drag_y = sign(self.y_vel) * (self.y_vel ** 2) * self.drag_constant
 
         self.x_force = f_x - drag_x
         self.y_force = f_y - drag_y
 
-        self.x_vel += self.x_force/self.mass*delta_time/.05
-        self.y_vel += self.y_force/self.mass*delta_time/.05
+        self.x_vel += self.x_force / self.mass * delta_time / 0.05
+        self.y_vel += self.y_force / self.mass * delta_time / 0.05
 
-        if not collision_check(self, self.center_x+self.x_vel, self.center_y, self.game_resources.wall_list):
-            self.center_x += self.x_vel*delta_time/.05
+        if not collision_check(
+            self,
+            self.center_x + self.x_vel,
+            self.center_y,
+            self.game_resources.wall_list,
+        ):
+            self.center_x += self.x_vel * delta_time / 0.05
         else:
             test_x = 0
             for i in range(math.ceil(self.x_vel)):
-                if not collision_check(self, self.center_x+test_x, self.center_y, self.game_resources.wall_list):
+                if not collision_check(
+                    self,
+                    self.center_x + test_x,
+                    self.center_y,
+                    self.game_resources.wall_list,
+                ):
                     test_x += sign(self.x_vel)
                 else:
                     test_x -= sign(self.x_vel)
                     break
             self.center_x += test_x
-        if not collision_check(self, self.center_x, self.center_y+self.y_vel, self.game_resources.wall_list):
-            self.center_y += self.y_vel*delta_time/.05
+        if not collision_check(
+            self,
+            self.center_x,
+            self.center_y + self.y_vel,
+            self.game_resources.wall_list,
+        ):
+            self.center_y += self.y_vel * delta_time / 0.05
         else:
             test_y = 0
             for i in range(math.ceil(self.y_vel)):
-                if not collision_check(self, self.center_x, self.center_y+test_y, self.game_resources.wall_list):
+                if not collision_check(
+                    self,
+                    self.center_x,
+                    self.center_y + test_y,
+                    self.game_resources.wall_list,
+                ):
                     test_y += sign(self.y_vel)
                 else:
                     test_y -= sign(self.y_vel)
                     break
             self.center_y += test_y
 
-        if collision_check(self, self.center_x, self.center_y, self.game_resources.wall_list):
+        if collision_check(
+            self, self.center_x, self.center_y, self.game_resources.wall_list
+        ):
             self.center_x = failsafe_x
             self.center_y = failsafe_y
 

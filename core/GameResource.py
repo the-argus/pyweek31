@@ -3,17 +3,26 @@ import math
 import os
 import random
 
-from constants.game import SCREEN_WIDTH, SCREEN_HEIGHT, ROOM_WIDTH, ROOM_HEIGHT, SPRITE_SCALING, PLAYER_DEFAULT_START, SPAWN_RADIUS
+from constants.game import (
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    ROOM_WIDTH,
+    ROOM_HEIGHT,
+    SPRITE_SCALING,
+    PLAYER_DEFAULT_START,
+)
 from constants.camera import LERP_MARGIN, LERP_SPEED, FOLLOW, IDLE
 from core.lerp import lerp
 from core.PlayerCharacter import PlayerCharacter
 from core.Enemies import Enemy
 
 
+
 class GameResources:
     """
     All resource handling like maps and sprites and rendering
     """
+
     def __init__(self, game_instance):
         self.game_instance = game_instance
 
@@ -37,7 +46,9 @@ class GameResources:
         self.shake_y = 0
 
         # list initilization
-        self.wall_list = arcade.SpriteList()  # contains all static objects which should have collision
+        self.wall_list = (
+            arcade.SpriteList()
+        )  # contains all static objects which should have collision
         self.floor_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()
@@ -55,18 +66,19 @@ class GameResources:
             wall1 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall2 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall1.center_x = 8
-            wall1.center_y = i*16
-            wall2.center_x = ROOM_WIDTH-8
-            wall2.center_y = i*16
+            wall1.center_y = i * 16
+            wall2.center_x = ROOM_WIDTH - 8
+            wall2.center_y = i * 16
             self.wall_list.append(wall1)
             self.wall_list.append(wall2)
-        for i in range(int(ROOM_WIDTH/16) + 1):
+
+        for i in range(int(ROOM_WIDTH / 16) + 1):
             wall1 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall2 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
-            wall1.center_x = i*16
+            wall1.center_x = i * 16
             wall1.center_y = 8
-            wall2.center_x = i*16
-            wall2.center_y = ROOM_HEIGHT-8
+            wall2.center_x = i * 16
+            wall2.center_y = ROOM_HEIGHT - 8
             self.wall_list.append(wall1)
             self.wall_list.append(wall2)
 
@@ -80,37 +92,46 @@ class GameResources:
         # camera scrolling
         self.follow_x = self.player_sprite.center_x
         self.follow_y = self.player_sprite.center_y
-        dist = math.sqrt(((self.view_left+(SCREEN_WIDTH/2)) - self.follow_x)**2 + ((self.view_bottom+(SCREEN_HEIGHT/2)) - self.follow_y)**2)
+        dist = math.sqrt(
+            ((self.view_left + (SCREEN_WIDTH / 2)) - self.follow_x) ** 2
+            + ((self.view_bottom + (SCREEN_HEIGHT / 2)) - self.follow_y) ** 2
+        )
         if dist >= LERP_MARGIN:
-            self.view_left = int(lerp(self.view_left, self.follow_x-(SCREEN_WIDTH/2), LERP_SPEED))
-            self.view_bottom = int(lerp(self.view_bottom, self.follow_y-(SCREEN_HEIGHT/2), LERP_SPEED))
+            self.view_left = int(
+                lerp(self.view_left, self.follow_x - (SCREEN_WIDTH / 2), LERP_SPEED)
+            )
+            self.view_bottom = int(
+                lerp(self.view_bottom, self.follow_y - (SCREEN_HEIGHT / 2), LERP_SPEED)
+            )
 
         self.player_sprite.on_update(delta_time)
 
         # screenshake and camera updates
         if self.shake_remain > 0:
-            self.shake_x = random.randrange(-self.shake_strength,self.shake_strength)
-            self.shake_y = random.randrange(-self.shake_strength,self.shake_strength)
+            self.shake_x = random.randrange(-self.shake_strength, self.shake_strength)
+            self.shake_y = random.randrange(-self.shake_strength, self.shake_strength)
             self.shake_remain -= 1
         else:
             self.shake_x = 0
             self.shake_y = 0
 
         arcade.set_viewport(
-            self.view_left+self.shake_x,
-            SCREEN_WIDTH + self.view_left+self.shake_x,
-            self.view_bottom+self.shake_y,
-            SCREEN_HEIGHT + self.view_bottom+self.shake_y
+            self.view_left + self.shake_x,
+            (SCREEN_WIDTH) + self.view_left + self.shake_x,
+            self.view_bottom + self.shake_y,
+            (SCREEN_HEIGHT) + self.view_bottom + self.shake_y,
         )
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.F:
-            self.game_instance.window.set_fullscreen(not self.game_instance.window.fullscreen)
+            self.game_instance.window.set_fullscreen(
+                not self.game_instance.window.fullscreen
+            )
             arcade.set_viewport(
-                self.view_left+self.shake_x,
-                self.view_left+self.shake_x+SCREEN_WIDTH,
-                self.view_bottom+self.shake_y,
-                self.view_bottom+self.shake_y+SCREEN_HEIGHT
+                self.view_left + self.shake_x,
+                self.view_left + self.shake_x + SCREEN_WIDTH,
+                self.view_bottom + self.shake_y,
+                self.view_bottom + self.shake_y + SCREEN_HEIGHT,
             )
 
     def spawn_new_enemy(self):
