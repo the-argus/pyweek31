@@ -1,10 +1,11 @@
-import arcade
 import math
 
-from constants.game import SPRITE_SCALING, SPRITE_IMAGE_SIZE
-from constants.physics import PLAYER_SPEED, PLAYER_DRAG, PLAYER_MASS
-from core.sign import sign
+import arcade
+
+from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
+from constants.physics import PLAYER_DRAG, PLAYER_MASS, PLAYER_SPEED
 from core.collision_check import collision_check
+from core.sign import sign
 
 
 class Enemy(arcade.Sprite):

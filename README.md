@@ -24,3 +24,10 @@ For style we use `black` a tool to auto format the code, use it with:
 ```
 black .
 ```
+
+We also sort import with `isort`:
+```
+isort .
+```
+
+You can run black after isort in some case the output differ.

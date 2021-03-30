@@ -1,7 +1,8 @@
-import arcade
 import math
 
-from constants.game import SCREEN_WIDTH, SCREEN_HEIGHT
+import arcade
+
+from constants.game import SCREEN_HEIGHT, SCREEN_WIDTH
 from core.GameResource import GameResources
 
 

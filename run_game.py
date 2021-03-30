@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import arcade
-import sys
 import os
+import sys
+
+import arcade
 
 # The major, minor version numbers your require
 MIN_VER = (3, 7)
@@ -9,7 +10,7 @@ MIN_VER = (3, 7)
 if sys.version_info[:2] < MIN_VER:
     sys.exit("This game requires Python {}.{}.".format(*MIN_VER))
 
-from constants.game import SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE
+from constants.game import SCREEN_HEIGHT, SCREEN_TITLE, SCREEN_WIDTH
 from core.GameInstance import GameInstance
 
 
@@ -79,7 +80,6 @@ class GameWindow(arcade.Window):
             text_size,
             anchor_x="center",
         )
-
 
 
 def load_texture_pair(filename):

@@ -1,5 +1,6 @@
-import arcade
 import math
+
+import arcade
 
 
 def lerp(start, end, ratio):

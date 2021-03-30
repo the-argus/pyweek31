@@ -1,10 +1,11 @@
-import arcade
 import math
 
-from constants.game import SPRITE_SCALING, SPRITE_IMAGE_SIZE
-from constants.physics import PLAYER_SPEED, PLAYER_DRAG, PLAYER_MASS
-from core.sign import sign
+import arcade
+
+from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
+from constants.physics import PLAYER_DRAG, PLAYER_MASS, PLAYER_SPEED
 from core.collision_check import collision_check
+from core.sign import sign
 
 
 class PlayerCharacter(arcade.Sprite):
@@ -73,8 +74,8 @@ class PlayerCharacter(arcade.Sprite):
         failsafe_y = self.center_y
 
         # physics stuff, just take direction from pressed keys and convert to x and y of pressed_force and drag vector
-        in_x = self.right_pressed-self.left_pressed
-        in_y = self.up_pressed-self.down_pressed
+        in_x = self.right_pressed - self.left_pressed
+        in_y = self.up_pressed - self.down_pressed
         is_moving = True
         if not in_x and not in_y:
             is_moving = False

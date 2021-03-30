@@ -1,22 +1,22 @@
-import arcade
 import math
 import os
 import random
 
-from constants.game import (
-    SCREEN_WIDTH,
-    SCREEN_HEIGHT,
-    ROOM_WIDTH,
-    ROOM_HEIGHT,
-    SPRITE_SCALING,
-    PLAYER_DEFAULT_START,
-)
+import arcade
+
+from constants.camera import FOLLOW, IDLE, LERP_MARGIN, LERP_SPEED
 from constants.enemies import SPAWN_RADIUS
-from constants.camera import LERP_MARGIN, LERP_SPEED, FOLLOW, IDLE
+from constants.game import (
+    PLAYER_DEFAULT_START,
+    ROOM_HEIGHT,
+    ROOM_WIDTH,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    SPRITE_SCALING,
+)
+from core.Enemies import Enemy
 from core.lerp import lerp
 from core.PlayerCharacter import PlayerCharacter
-from core.Enemies import Enemy
-
 
 
 class GameResources:
@@ -63,7 +63,7 @@ class GameResources:
             self.spawn_new_enemy()
 
         # placeholder room
-        for i in range(int(ROOM_HEIGHT/16)):
+        for i in range(int(ROOM_HEIGHT / 16)):
             wall1 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall2 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall1.center_x = 8
@@ -143,7 +143,10 @@ class GameResources:
         for wall in self.wall_list:
             if arcade.check_for_collision(self.enemy_sprite, wall):
                 flag = False
-        if self.calculate_distance_from_player(start_x, start_y) > SPAWN_RADIUS and flag:
+        if (
+            self.calculate_distance_from_player(start_x, start_y) > SPAWN_RADIUS
+            and flag
+        ):
             self.enemy_list.append(self.enemy_sprite)
 
     def calculate_distance_from_player(self, enemy_x, enemy_y):
