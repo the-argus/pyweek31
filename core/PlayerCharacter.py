@@ -6,6 +6,7 @@ from constants.physics import PLAYER_SPEED, PLAYER_DRAG, PLAYER_MASS
 from core.sign import sign
 from core.collision_check import collision_check
 
+
 class PlayerCharacter(arcade.Sprite):
     """ Player Sprite"""
 
@@ -24,7 +25,7 @@ class PlayerCharacter(arcade.Sprite):
         self.left_pressed = False
         self.right_pressed = False
 
-        #coords and physics
+        # coords and physics
         self.center_x = position[0]
         self.center_y = position[1]
         self.x_force = 0
@@ -67,56 +68,78 @@ class PlayerCharacter(arcade.Sprite):
             self.right_pressed = False
 
     def on_update(self, delta_time):
-        #failsafe cordinates in case we need to revert changes
+        # failsafe cordinates in case we need to revert changes
         failsafe_x = self.center_x
         failsafe_y = self.center_y
 
-        #physics stuff, just take direction from pressed keys and convert to x and y of pressed_force and drag vector
-        in_x = ((self.right_pressed)-(self.left_pressed))
-        in_y = ((self.up_pressed)-(self.down_pressed))
+        # physics stuff, just take direction from pressed keys and convert to x and y of pressed_force and drag vector
+        in_x = (self.right_pressed) - (self.left_pressed)
+        in_y = (self.up_pressed) - (self.down_pressed)
         is_moving = True
         if not in_x and not in_y:
             is_moving = False
-        dir = math.atan2(in_y,in_x)
+        dir = math.atan2(in_y, in_x)
 
         f_x = math.cos(dir) * self.press_force * is_moving
         f_y = math.sin(dir) * self.press_force * is_moving
 
-        drag_x = sign(self.x_vel) * (self.x_vel**2) * self.drag_constant
-        drag_y = sign(self.y_vel) * (self.y_vel**2) * self.drag_constant
+        drag_x = sign(self.x_vel) * (self.x_vel ** 2) * self.drag_constant
+        drag_y = sign(self.y_vel) * (self.y_vel ** 2) * self.drag_constant
 
         self.x_force = f_x - drag_x
         self.y_force = f_y - drag_y
 
-        self.x_vel += self.x_force/self.mass*delta_time/.05
-        self.y_vel += self.y_force/self.mass*delta_time/.05
+        self.x_vel += self.x_force / self.mass * delta_time / 0.05
+        self.y_vel += self.y_force / self.mass * delta_time / 0.05
 
-        if not collision_check(self,self.center_x+self.x_vel,self.center_y,self.game_resources.wall_list):
-            self.center_x += self.x_vel*delta_time/.05
+        if not collision_check(
+            self,
+            self.center_x + self.x_vel,
+            self.center_y,
+            self.game_resources.wall_list,
+        ):
+            self.center_x += self.x_vel * delta_time / 0.05
         else:
             test_x = 0
             for i in range(math.ceil(self.x_vel)):
-                if not collision_check(self,self.center_x+test_x,self.center_y,self.game_resources.wall_list):
+                if not collision_check(
+                    self,
+                    self.center_x + test_x,
+                    self.center_y,
+                    self.game_resources.wall_list,
+                ):
                     test_x += sign(self.x_vel)
                 else:
                     test_x -= sign(self.x_vel)
                     break
             self.center_x += test_x
-        if not collision_check(self,self.center_x,self.center_y+self.y_vel,self.game_resources.wall_list):
-            self.center_y += self.y_vel*delta_time/.05
+        if not collision_check(
+            self,
+            self.center_x,
+            self.center_y + self.y_vel,
+            self.game_resources.wall_list,
+        ):
+            self.center_y += self.y_vel * delta_time / 0.05
         else:
             test_y = 0
             for i in range(math.ceil(self.y_vel)):
-                if not collision_check(self,self.center_x,self.center_y+test_y,self.game_resources.wall_list):
+                if not collision_check(
+                    self,
+                    self.center_x,
+                    self.center_y + test_y,
+                    self.game_resources.wall_list,
+                ):
                     test_y += sign(self.y_vel)
                 else:
                     test_y -= sign(self.y_vel)
                     break
             self.center_y += test_y
 
-        if collision_check(self,self.center_x,self.center_y,self.game_resources.wall_list):
+        if collision_check(
+            self, self.center_x, self.center_y, self.game_resources.wall_list
+        ):
             self.center_x = failsafe_x
             self.center_y = failsafe_y
 
     def load_textures(self):
-        self.sprite_base = arcade.Sprite("resources/player_static.png",self.scale)
+        self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)

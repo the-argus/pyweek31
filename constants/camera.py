@@ -1,7 +1,7 @@
-LERP_MARGIN = 50 #distance from the player before camera should follow, in pixels
+LERP_MARGIN = 50  # distance from the player before camera should follow, in pixels
 
 LERP_SPEED = 0.95
 
-#camera behaviors
+# camera behaviors
 FOLLOW = 1
 IDLE = 2

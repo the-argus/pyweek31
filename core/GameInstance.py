@@ -4,6 +4,7 @@ import math
 from constants.game import SCREEN_WIDTH, SCREEN_HEIGHT
 from core.GameResource import GameResources
 
+
 class GameInstance:
     """
     This is an instance of the game and all of the different components needed to render it.
