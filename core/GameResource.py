@@ -11,6 +11,7 @@ from constants.game import (
     SPRITE_SCALING,
     PLAYER_DEFAULT_START,
 )
+from constants.enemies import SPAWN_RADIUS
 from constants.camera import LERP_MARGIN, LERP_SPEED, FOLLOW, IDLE
 from core.lerp import lerp
 from core.PlayerCharacter import PlayerCharacter
