@@ -17,3 +17,10 @@ Start the game
 ```
 python run_game.py
 ```
+
+## Style
+
+For style we use `black` a tool to auto format the code, use it with:
+```
+black .
+```
