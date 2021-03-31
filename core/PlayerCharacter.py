@@ -4,8 +4,10 @@ import arcade
 
 from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
 from constants.physics import PLAYER_DRAG, PLAYER_MASS, PLAYER_SPEED
+from constants.enemies import ENEMY_BOUNCE, ENEMY_SPRITE_WIDTH
 from core.collision_check import collision_check
 from core.sign import sign
+from core.dot_product import dot_product
 
 
 class PlayerCharacter(arcade.Sprite):
@@ -25,6 +27,7 @@ class PlayerCharacter(arcade.Sprite):
         self.down_pressed = False
         self.left_pressed = False
         self.right_pressed = False
+        self.activated = False
 
         # coords and physics
         self.center_x = position[0]
@@ -36,6 +39,11 @@ class PlayerCharacter(arcade.Sprite):
         self.mass = PLAYER_MASS
         self.press_force = PLAYER_SPEED
         self.drag_constant = PLAYER_DRAG
+
+        #determines if bouncing calculations have already been done
+        self.is_bouncing = False
+        self.hit_dir = 0
+        self.collided_enemy = None
 
     def on_mouse_motion(self, x, y, dx, dy):
         pass
@@ -56,6 +64,8 @@ class PlayerCharacter(arcade.Sprite):
             self.left_pressed = True
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = True
+        elif key == arcade.key.SPACE:
+            self.activated = True
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
@@ -67,6 +77,8 @@ class PlayerCharacter(arcade.Sprite):
             self.left_pressed = False
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = False
+        elif key == arcade.key.SPACE:
+            self.activated = False
 
     def on_update(self, delta_time):
         # failsafe coordinates in case we need to revert changes
@@ -87,11 +99,36 @@ class PlayerCharacter(arcade.Sprite):
         drag_x = sign(self.x_vel) * (self.x_vel ** 2) * self.drag_constant
         drag_y = sign(self.y_vel) * (self.y_vel ** 2) * self.drag_constant
 
-        self.x_force = f_x - drag_x
-        self.y_force = f_y - drag_y
+        enemy_hit_list = arcade.check_for_collision_with_list(self,self.game_resources.enemy_list)
+        if len(enemy_hit_list) >= 1 and not self.is_bouncing:
+            self.hit_dir = math.atan2(self.center_y-enemy_hit_list[0].center_y, self.center_x-enemy_hit_list[0].center_x)
+            self.is_bouncing = True
+            self.collided_enemy = enemy_hit_list[0]
+        elif len(enemy_hit_list) >= 1:
+            self.enemy_reflect_y = ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_y-self.center_y)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
+            self.enemy_reflect_x = ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_x-self.center_x)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
+            if self.is_bouncing:
+                self.update_bounce((math.cos(self.hit_dir),
+                                    math.sin(self.hit_dir)))
+        else:
+            self.is_bouncing = False
+
+        if not len(enemy_hit_list):
+            self.enemy_reflect_y = 0
+            self.enemy_reflect_x = 0
+
+        if self.is_bouncing:
+            #needs to be nested because the list wont exist if first condition isnt met
+            if self.collided_enemy!= enemy_hit_list[0]:
+                self.is_bouncing = False
+
+        self.x_force = f_x - drag_x + self.enemy_reflect_x
+        self.y_force = f_y - drag_y + self.enemy_reflect_y
 
         self.x_vel += self.x_force / self.mass * delta_time / 0.05
         self.y_vel += self.y_force / self.mass * delta_time / 0.05
+
+        #Wall Collision
 
         if not collision_check(
             self,
@@ -144,3 +181,12 @@ class PlayerCharacter(arcade.Sprite):
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
+
+    def update_bounce(self, normal):
+        """Use normal (x,y) tuple to reflect current speed"""
+        vel = (self.x_vel,self.y_vel)
+        prod = 2*dot_product(normal,vel)
+        r = [normal[0]*prod,normal[1]*prod]
+        self.x_vel = (-r[0]+vel[0])*ENEMY_BOUNCE
+        self.y_vel = (-r[1]+vel[1])*ENEMY_BOUNCE
+        #Reflection = 2 * (normal dot velocity) * normal - velocity

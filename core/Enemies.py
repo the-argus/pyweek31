@@ -14,7 +14,7 @@ class Enemy(arcade.Sprite):
     def __init__(self, position, game_resources):
 
         # Set up parent class
-        super().__init__("resources/wall_test.png", SPRITE_SCALING)
+        super().__init__("resources/enemy_static.png", SPRITE_SCALING)
         self.game_resources = game_resources
         self.speed = PLAYER_SPEED
         self.wall_list = game_resources.wall_list
@@ -35,4 +35,4 @@ class Enemy(arcade.Sprite):
         pass
 
     def load_textures(self):
-        self.sprite_base = arcade.Sprite("resources/wall_test.png", self.scale)
+        self.sprite_base = arcade.Sprite("resources/enemy_static.png", self.scale)
