@@ -4,13 +4,20 @@ from constants.game import PARENT_DIR
 from constants.animation import IDLE_CYCLE_LENGTH
 
 
-class Animated(arcade.Sprite):
+class Animated(arcade.AnimatedWalkingSprite):
     """
     An extendable class to handle animations.
     """
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *args):
+        super().__init__(*args)
+
+    def add_idle(self, textures):
+        self.walk_left_textures.append(textures[0])
+        self.walk_right_textures.append(textures[1])
+
+
+'''
         self.face_direction = None
         self.idle_list = None
 
@@ -27,3 +34,4 @@ class Animated(arcade.Sprite):
 
     def update_animation(self, delta_time: float = 1 / 60):
         pass
+'''

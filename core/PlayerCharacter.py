@@ -6,9 +6,10 @@ from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
 from constants.physics import PLAYER_DRAG, PLAYER_MASS, PLAYER_SPEED
 from core.collision_check import collision_check
 from core.sign import sign
+from core.animated import Animated
 
 
-class PlayerCharacter(arcade.Sprite):
+class PlayerCharacter(Animated):
     """ Player Sprite"""
 
     def __init__(self, position, game_resources):
@@ -144,3 +145,4 @@ class PlayerCharacter(arcade.Sprite):
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
+        self.texture = arcade.load_texture("resources/player_static.png")
