@@ -1,5 +1,4 @@
 import math
-
 import arcade
 
 from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
