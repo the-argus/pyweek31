@@ -3,12 +3,12 @@ import math
 import arcade
 
 from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
-from constants.physics import PLAYER_DRAG, PLAYER_MASS, PLAYER_SPEED
-from core.collision_check import collision_check
+from constants.physics import PLAYER_SPEED
+from core.PhysicsSprite import PhysicsSprite
 from core.sign import sign
 
 
-class Enemy(arcade.Sprite):
+class Enemy(PhysicsSprite):
     """ Player Sprite"""
 
     def __init__(self, position, game_resources):

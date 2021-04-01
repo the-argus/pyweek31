@@ -2,21 +2,21 @@ import math
 
 import arcade
 
-from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
-from constants.physics import PLAYER_DRAG, PLAYER_MASS, PLAYER_SPEED
+from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING, JETPACK
+from constants.physics import PLAYER_MASS, PLAYER_SPEED, JETPACK_FORCE, PLAYER_FRICTION
 from constants.enemies import ENEMY_BOUNCE, ENEMY_SPRITE_WIDTH
-from core.collision_check import collision_check
+from core.PhysicsSprite import PhysicsSprite
 from core.sign import sign
 from core.dot_product import dot_product
 
 
-class PlayerCharacter(arcade.Sprite):
+class PlayerCharacter(PhysicsSprite):
     """ Player Sprite"""
 
     def __init__(self, position, game_resources):
 
         # Set up parent class
-        super().__init__("resources/player_static.png")
+        super().__init__("resources/player_static.png",SPRITE_SCALING)
         self.game_resources = game_resources
 
         self.load_textures()
@@ -34,16 +34,16 @@ class PlayerCharacter(arcade.Sprite):
         self.center_y = position[1]
         self.x_force = 0
         self.y_force = 0
-        self.x_vel = 0
-        self.y_vel = 0
         self.mass = PLAYER_MASS
+        self.friction = PLAYER_FRICTION
         self.press_force = PLAYER_SPEED
-        self.drag_constant = PLAYER_DRAG
 
-        #determines if bouncing calculations have already been done
-        self.is_bouncing = False
-        self.hit_dir = 0
-        self.collided_enemy = None
+        # gadget mode
+        self.mode = JETPACK
+
+        # jetpack physics
+        self.jetpack_x = 0
+        self.jetpack_y = 0
 
     def on_mouse_motion(self, x, y, dx, dy):
         pass
@@ -81,112 +81,44 @@ class PlayerCharacter(arcade.Sprite):
             self.activated = False
 
     def on_update(self, delta_time):
-        # failsafe coordinates in case we need to revert changes
-        failsafe_x = self.center_x
-        failsafe_y = self.center_y
-
         # physics stuff, just take direction from pressed keys and convert to x and y of pressed_force and drag vector
         in_x = self.right_pressed - self.left_pressed
         in_y = self.up_pressed - self.down_pressed
         is_moving = True
-        if not in_x and not in_y:
+        if not in_x and not in_y and not self.activated:
             is_moving = False
         dir = math.atan2(in_y, in_x)
 
         f_x = math.cos(dir) * self.press_force * is_moving
         f_y = math.sin(dir) * self.press_force * is_moving
 
-        drag_x = sign(self.x_vel) * (self.x_vel ** 2) * self.drag_constant
-        drag_y = sign(self.y_vel) * (self.y_vel ** 2) * self.drag_constant
-
+        # force from bouncing off enemies
         enemy_hit_list = arcade.check_for_collision_with_list(self,self.game_resources.enemy_list)
-        if len(enemy_hit_list) >= 1 and not self.is_bouncing:
-            self.hit_dir = math.atan2(self.center_y-enemy_hit_list[0].center_y, self.center_x-enemy_hit_list[0].center_x)
-            self.is_bouncing = True
-            self.collided_enemy = enemy_hit_list[0]
-        elif len(enemy_hit_list) >= 1:
-            self.enemy_reflect_y = ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_y-self.center_y)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
-            self.enemy_reflect_x = ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_x-self.center_x)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
-            if self.is_bouncing:
-                self.update_bounce((math.cos(self.hit_dir),
-                                    math.sin(self.hit_dir)))
+        if len(enemy_hit_list):
+            hit_dir = math.atan2(self.center_y-enemy_hit_list[0].center_y, self.center_x-enemy_hit_list[0].center_x)
+            self.enemy_reflect_y = sign(math.sin(hit_dir))*ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_y-self.center_y)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
+            self.enemy_reflect_x = sign(math.cos(hit_dir))*ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_x-self.center_x)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
         else:
-            self.is_bouncing = False
-
-        if not len(enemy_hit_list):
             self.enemy_reflect_y = 0
             self.enemy_reflect_x = 0
 
-        if self.is_bouncing:
-            #needs to be nested because the list wont exist if first condition isnt met
-            if self.collided_enemy!= enemy_hit_list[0]:
-                self.is_bouncing = False
+        # force from using the jetpack
+        if self.mode == JETPACK and self.activated:
+            mouse_dir = math.atan2(self.game_resources.mouse_y+self.game_resources.view_bottom-self.center_y, self.game_resources.mouse_x+self.game_resources.view_left-self.center_x)
+            self.jetpack_x = JETPACK_FORCE*math.cos(mouse_dir)
+            self.jetpack_y = JETPACK_FORCE*math.sin(mouse_dir)
+        else:
+            self.jetpack_x = 0
+            self.jetpack_y = 0
 
-        self.x_force = f_x - drag_x + self.enemy_reflect_x
-        self.y_force = f_y - drag_y + self.enemy_reflect_y
+        self.x_force = f_x - drag_x + self.enemy_reflect_x + self.jetpack_x - self.friction*is_moving*sign(self.x_vel)
+        self.y_force = f_y - drag_y + self.enemy_reflect_y + self.jetpack_y - self.friction*is_moving*sign(self.y_vel)
 
         self.x_vel += self.x_force / self.mass * delta_time / 0.05
         self.y_vel += self.y_force / self.mass * delta_time / 0.05
-
-        #Wall Collision
-
-        if not collision_check(
-            self,
-            self.center_x + self.x_vel,
-            self.center_y,
-            self.game_resources.wall_list,
-        ):
-            self.center_x += self.x_vel * delta_time / 0.05
-        else:
-            test_x = 0
-            for i in range(math.ceil(self.x_vel)):
-                if not collision_check(
-                    self,
-                    self.center_x + test_x,
-                    self.center_y,
-                    self.game_resources.wall_list,
-                ):
-                    test_x += sign(self.x_vel)
-                else:
-                    test_x -= sign(self.x_vel)
-                    break
-            self.center_x += test_x
-        if not collision_check(
-            self,
-            self.center_x,
-            self.center_y + self.y_vel,
-            self.game_resources.wall_list,
-        ):
-            self.center_y += self.y_vel * delta_time / 0.05
-        else:
-            test_y = 0
-            for i in range(math.ceil(self.y_vel)):
-                if not collision_check(
-                    self,
-                    self.center_x,
-                    self.center_y + test_y,
-                    self.game_resources.wall_list,
-                ):
-                    test_y += sign(self.y_vel)
-                else:
-                    test_y -= sign(self.y_vel)
-                    break
-            self.center_y += test_y
-
-        if collision_check(
-            self, self.center_x, self.center_y, self.game_resources.wall_list
-        ):
-            self.center_x = failsafe_x
-            self.center_y = failsafe_y
+        # clamp velocity to max speed
+        vel_vec2 = math.sqrt(self.x_vel**2 + self.y_vel**2)
+        # while vel_vec2
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
-
-    def update_bounce(self, normal):
-        """Use normal (x,y) tuple to reflect current speed"""
-        vel = (self.x_vel,self.y_vel)
-        prod = 2*dot_product(normal,vel)
-        r = [normal[0]*prod,normal[1]*prod]
-        self.x_vel = (-r[0]+vel[0])*ENEMY_BOUNCE
-        self.y_vel = (-r[1]+vel[1])*ENEMY_BOUNCE
-        #Reflection = 2 * (normal dot velocity) * normal - velocity

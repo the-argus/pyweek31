@@ -29,7 +29,8 @@ class GameWindow(arcade.Window):
         # Save original size when we exit fullscreen
         self.original_size = self.get_size()
         # screensize multiplier so that the viewport gets scaled up in fullscreen
-        self.screensize_multiplier = 1
+        self.screensize_multiplier = arcade.window_commands.get_display_size()[0]/SCREEN_WIDTH
+        print(arcade.window_commands.get_display_size())
 
     def setup(self):
         """ Set up everything with the game """
@@ -50,8 +51,8 @@ class GameWindow(arcade.Window):
 
     def on_mouse_motion(self, x, y, dx, dy):
         """passes mouse info to the gameinstance on_mouse_motion but properly scaled to any screensize changes"""
-        scaledx = x / self.screensize_multiplier
-        scaledy = y / self.screensize_multiplier
+        scaledx = int(x / self.screensize_multiplier)
+        scaledy = int(y / self.screensize_multiplier)
         scaleddx = dx / self.screensize_multiplier
         scaleddy = dy / self.screensize_multiplier
         self.game_instance.on_mouse_motion(scaledx, scaledy, dx, dy)

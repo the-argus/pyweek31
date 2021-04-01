@@ -4,6 +4,7 @@ import arcade
 
 from constants.game import SCREEN_HEIGHT, SCREEN_WIDTH
 from core.GameResource import GameResources
+from core.physics_engine import PhysicsEngine
 
 
 class GameInstance:
@@ -16,10 +17,9 @@ class GameInstance:
         # Reference to main window object
         self.window = window
 
-        self.horizontal_key_list = []
-        self.verticle_key_list = []
-
         self.game_resources = GameResources(self)
+
+        self.physics_engine = PhysicsEngine()
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
@@ -31,6 +31,7 @@ class GameInstance:
         self.game_resources.player_sprite.on_key_release(key, modifiers)
 
     def on_mouse_motion(self, x, y, dx, dy):
+        self.game_resources.on_mouse_motion(x, y, dx, dy)
         self.game_resources.player_sprite.on_mouse_motion(x, y, dx, dy)
 
     def on_mouse_press(self, x, y, button, modifiers):
@@ -54,3 +55,13 @@ class GameInstance:
     def on_update(self, delta_time):
         """ Movement and game logic """
         self.game_resources.on_update(delta_time)
+
+        # update any changes to walls
+        self.physics_engine.set_obstacles(self.game_resources.wall_list)
+
+        # update dynamic entities
+        self.game_resources.player_sprite.on_update(delta_time)
+        self.physics_engine.move_sprite(self.game_resources.player_sprite,delta_time)
+
+        for sprite in self.game_resources.enemy_list:
+            self.physics_engine.move_sprite(sprite,delta_time)

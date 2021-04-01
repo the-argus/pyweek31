@@ -35,6 +35,10 @@ class GameResources:
         self.view_bottom = 0
         self.view_left = 0
 
+        # keep track of mouse
+        self.mouse_x = 0
+        self.mouse_y = 0
+
         # camera behavior and follow location
         self.behavior = FOLLOW
         self.follow_x = PLAYER_DEFAULT_START[0]
@@ -105,8 +109,6 @@ class GameResources:
                 lerp(self.view_bottom, self.follow_y - (SCREEN_HEIGHT / 2), LERP_SPEED)
             )
 
-        self.player_sprite.on_update(delta_time)
-
         # screenshake and camera updates
         if self.shake_remain > 0:
             self.shake_x = random.randrange(-self.shake_strength, self.shake_strength)
@@ -115,6 +117,14 @@ class GameResources:
         else:
             self.shake_x = 0
             self.shake_y = 0
+
+        # clamp viewport to room
+        if not (0 < self.view_left < ROOM_WIDTH-SCREEN_WIDTH):
+            self.view_left = min(ROOM_WIDTH-SCREEN_WIDTH,self.view_left)
+            self.view_left = max(self.view_left,0)
+        if not (0 < self.view_bottom < ROOM_HEIGHT-SCREEN_HEIGHT):
+            self.view_bottom = min(ROOM_HEIGHT-SCREEN_HEIGHT,self.view_bottom)
+            self.view_bottom = max(self.view_bottom,0)
 
         arcade.set_viewport(
             self.view_left + self.shake_x,
@@ -153,3 +163,7 @@ class GameResources:
         player_x = self.player_sprite.center_x
         player_y = self.player_sprite.center_y
         return math.sqrt(abs(enemy_x - player_x) ** 2 + abs(enemy_y - player_y) ** 2)
+
+    def on_mouse_motion(self, x, y, dx, dy):
+        self.mouse_x = x
+        self.mouse_y = y
