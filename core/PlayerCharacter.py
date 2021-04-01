@@ -71,7 +71,7 @@ class PlayerCharacter(Animated):
 
     def on_update(self, delta_time):
 
-        #update animation
+        # update animation
         self.animate(delta_time)
 
         # failsafe coordinates in case we need to revert changes

@@ -26,7 +26,6 @@ class Animated(arcade.Sprite):
         self.set_hit_box(self.texture.hit_box_points)
 
     def animate(self, delta_time: float = 1 / 60):
-        print('00000000000000000')
         # Figure out if we need to flip face left or right
         if self.x_vel < 0 and self.face_direction == RIGHT_FACING:
             self.face_direction = LEFT_FACING
@@ -35,7 +34,6 @@ class Animated(arcade.Sprite):
 
         # Idle animation
         if self.change_x == 0 and self.change_y == 0:
-            print(self.idle_list)
             self.texture = self.idle_list[0][self.face_direction]
             return
 
@@ -45,6 +43,5 @@ class Animated(arcade.Sprite):
         """
         return [
             arcade.load_texture(filename),
-            arcade.load_texture(filename, flipped_horizontally=True)
+            arcade.load_texture(filename, flipped_horizontally=True),
         ]
-
