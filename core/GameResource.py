@@ -13,6 +13,7 @@ from constants.game import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     SPRITE_SCALING,
+    GRID_SIZE
 )
 from core.Enemies import Enemy
 from core.lerp import lerp
@@ -47,9 +48,7 @@ class GameResources:
         self.shake_y = 0
 
         # list initilization
-        self.wall_list = (
-            arcade.SpriteList()
-        )  # contains all static objects which should have collision
+        self.wall_list = arcade.SpriteList(use_spatial_hash=True, spatial_hash_cell_size=16) # contains all static objects which should have collision
         self.floor_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()
@@ -59,26 +58,28 @@ class GameResources:
         self.player_list.append(self.player_sprite)
 
         # enemies
-        for i in range(10):
-            self.spawn_new_enemy()
+        for i in range(3):
+            created = self.spawn_new_enemy()
+            if not created:
+                i -= 1
 
         # placeholder room
         for i in range(int(ROOM_HEIGHT / 16)):
             wall1 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall2 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall1.center_x = 8
-            wall1.center_y = i * 16
+            wall1.center_y = (i * 16) + 8
             wall2.center_x = ROOM_WIDTH - 8
-            wall2.center_y = i * 16
+            wall2.center_y = (i * 16) + 8
             self.wall_list.append(wall1)
             self.wall_list.append(wall2)
 
-        for i in range(int(ROOM_WIDTH / 16) + 1):
+        for i in range(int(ROOM_WIDTH / 16)):
             wall1 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
             wall2 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
-            wall1.center_x = i * 16
+            wall1.center_x = (i * 16) + 8
             wall1.center_y = 8
-            wall2.center_x = i * 16
+            wall2.center_x = (i * 16) + 8
             wall2.center_y = ROOM_HEIGHT - 8
             self.wall_list.append(wall1)
             self.wall_list.append(wall2)
@@ -106,6 +107,8 @@ class GameResources:
             )
 
         self.player_sprite.on_update(delta_time)
+        for enemy_sprite in self.enemy_list:
+            enemy_sprite.on_update(delta_time)
 
         # screenshake and camera updates
         if self.shake_remain > 0:
@@ -148,6 +151,9 @@ class GameResources:
             and flag
         ):
             self.enemy_list.append(self.enemy_sprite)
+            return True
+        else:
+            return False
 
     def calculate_distance_from_player(self, enemy_x, enemy_y):
         player_x = self.player_sprite.center_x
