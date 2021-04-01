@@ -72,8 +72,7 @@ class PlayerCharacter(Animated):
     def on_update(self, delta_time):
 
         #update animation
-        self.update_animation(delta_time)
-        print(self.cur_texture_index)
+        self.animate(delta_time)
 
         # failsafe coordinates in case we need to revert changes
         failsafe_x = self.center_x
@@ -150,4 +149,4 @@ class PlayerCharacter(Animated):
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
-        self.texture = arcade.load_texture("resources/player_static.png")
+        self.idle_textures(["player_static.png"])
