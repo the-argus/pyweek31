@@ -149,4 +149,7 @@ class PlayerCharacter(Animated):
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
-        self.idle_textures(["player_static.png"])
+        self.idle_textures(["player_static.png", "player_static_alt.png"])
+        self.walk_textures(
+            ["player_static.png", "player_static_alt.png", "player_static_original.png"]
+        )
