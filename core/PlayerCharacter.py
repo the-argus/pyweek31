@@ -5,15 +5,17 @@ from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
 from constants.physics import PLAYER_DRAG, PLAYER_MASS, PLAYER_SPEED
 from core.collision_check import collision_check
 from core.sign import sign
+from core.animated import Animated
 
 
-class PlayerCharacter(arcade.Sprite):
+class PlayerCharacter(Animated):
     """ Player Sprite"""
 
     def __init__(self, position, game_resources):
 
         # Set up parent class
         super().__init__("resources/player_static.png")
+
         self.game_resources = game_resources
 
         self.load_textures()
@@ -68,6 +70,10 @@ class PlayerCharacter(arcade.Sprite):
             self.right_pressed = False
 
     def on_update(self, delta_time):
+
+        # update animation
+        self.animate(delta_time)
+
         # failsafe coordinates in case we need to revert changes
         failsafe_x = self.center_x
         failsafe_y = self.center_y
@@ -143,3 +149,7 @@ class PlayerCharacter(arcade.Sprite):
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
+        self.idle_textures(["player_static.png", "player_static_alt.png"])
+        self.walk_textures(
+            ["player_static.png", "player_static_alt.png", "player_static_original.png"]
+        )

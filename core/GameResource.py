@@ -13,7 +13,7 @@ from constants.game import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     SPRITE_SCALING,
-    GRID_SIZE
+    GRID_SIZE,
 )
 from core.Enemies import Enemy
 from core.lerp import lerp
@@ -48,7 +48,9 @@ class GameResources:
         self.shake_y = 0
 
         # list initilization
-        self.wall_list = arcade.SpriteList(use_spatial_hash=True, spatial_hash_cell_size=16) # contains all static objects which should have collision
+        self.wall_list = arcade.SpriteList(
+            use_spatial_hash=True, spatial_hash_cell_size=16
+        )  # contains all static objects which should have collision
         self.floor_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()

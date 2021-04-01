@@ -34,13 +34,9 @@ class Enemy(arcade.Sprite):
             self.game_resources.player_sprite.center_y,
         ]
 
-        self.barrier_list = arcade.AStarBarrierList(self,
-                                                    self.wall_list,
-                                                    GRID_SIZE,
-                                                    0,
-                                                    ROOM_WIDTH,
-                                                    0,
-                                                    ROOM_HEIGHT)
+        self.barrier_list = arcade.AStarBarrierList(
+            self, self.wall_list, GRID_SIZE, 0, ROOM_WIDTH, 0, ROOM_HEIGHT
+        )
         self.calculate_astar()
 
     def update_animation(self, delta_time: float = 1 / 60):
@@ -62,8 +58,8 @@ class Enemy(arcade.Sprite):
             self.barrier_list,
             diagonal_movement=False,
         )
-        print(f"X{self.center_x} Y{self.center_y}")
-        print(self.path)
+        # print(f"X{self.center_x} Y{self.center_y}")
+        # print(self.path)
 
     def on_draw(self):
         if self.path:
