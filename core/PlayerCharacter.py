@@ -16,6 +16,7 @@ class PlayerCharacter(Animated):
 
         # Set up parent class
         super().__init__("resources/player_static.png")
+
         self.game_resources = game_resources
 
         self.load_textures()
@@ -70,6 +71,11 @@ class PlayerCharacter(Animated):
             self.right_pressed = False
 
     def on_update(self, delta_time):
+
+        #update animation
+        self.update_animation(delta_time)
+        print(self.cur_texture_index)
+
         # failsafe coordinates in case we need to revert changes
         failsafe_x = self.center_x
         failsafe_y = self.center_y
