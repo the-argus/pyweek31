@@ -9,7 +9,7 @@ from constants.enemies import SPAWN_RADIUS
 from constants.game import (GRID_SIZE, PLAYER_DEFAULT_START, ROOM_HEIGHT,
                             ROOM_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH,
                             SPRITE_SCALING)
-from core.Enemies import Enemy
+from core.Enemies import Jetpack, Default
 from core.MouseCursor import MouseCursor
 from core.lerp import lerp
 from core.PlayerCharacter import PlayerCharacter
@@ -63,7 +63,7 @@ class GameResources:
         self.player_list.append(self.player_sprite)
 
         # enemies
-        for i in range(3):
+        for i in range(10):
             created = self.spawn_new_enemy()
             if not created:
                 i -= 1
@@ -171,7 +171,13 @@ class GameResources:
         start_x = random.randint(0, ROOM_WIDTH)
         start_y = random.randint(0, ROOM_HEIGHT)
         flag = True
-        self.enemy_sprite = Enemy((start_x, start_y), self)
+        type = random.randint(0, 1)
+
+        if type == 0:
+            self.enemy_sprite = Default((start_x, start_y), self)
+        elif type == 1:
+            self.enemy_sprite = Jetpack((start_x, start_y), self)
+
         for wall in self.wall_list:
             if len(arcade.check_for_collision_with_list(self.enemy_sprite, self.wall_list)) >= 1:
                 flag = False

@@ -65,3 +65,21 @@ class Enemy(PhysicsSprite):
     def on_draw(self):
         if self.path:
             arcade.draw_line_strip(self.path, arcade.color.BLUE, 2)
+
+
+class Default(Enemy):
+    def __init__(self, position, game_resources):
+        super().__init__(position, game_resources)
+
+
+class Jetpack(Enemy):
+    def __init__(self, position, game_resources):
+        super().__init__(position, game_resources)
+
+    def on_update(self, delta_time):
+        pass
+        # move
+        # if clear line of sight:
+        #     move faster
+        # if collision_check(self, 0, 0, self.wall_list):
+        #     stun
