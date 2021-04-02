@@ -2,6 +2,7 @@ import arcade
 import math
 
 from core.dot_product import dot_product
+from core.sign import sign
 from constants.game import SPRITE_IMAGE_SIZE
 
 class PhysicsEngine:
@@ -19,56 +20,51 @@ class PhysicsEngine:
         failsafe_x = sprite.center_x
         failsafe_y = sprite.center_y
 
-        if not collision_check(
+        if not self.collision_check(
             sprite,
             sprite.center_x + sprite.x_vel,
-            sprite.center_y,
-            self.obstacles
+            sprite.center_y
         ):
             sprite.center_x += sprite.x_vel * delta_time / 0.05
         else:
             test_x = 0
-            for i in range(math.ceil(sprite.x_vel)):
-                if not collision_check(
+            for i in range(math.ceil(abs(sprite.x_vel))):
+                if not self.collision_check(
                     sprite,
                     sprite.center_x + test_x,
-                    sprite.center_y,
-                    self.obstacles
+                    sprite.center_y
                 ):
                     test_x += sign(sprite.x_vel)
                 else:
                     test_x -= sign(sprite.x_vel)
                     break
             sprite.center_x += test_x
-        if not collision_check(
+            sprite.x_vel = 0
+        if not self.collision_check(
             sprite,
             sprite.center_x,
-            sprite.center_y + sprite.y_vel,
-            self.obstacles,
+            sprite.center_y + sprite.y_vel
         ):
             sprite.center_y += sprite.y_vel * delta_time / 0.05
         else:
             test_y = 0
-            for i in range(math.ceil(sprite.y_vel)):
-                if not collision_check(
+            for i in range(math.ceil(abs(sprite.y_vel))):
+                if not self.collision_check(
                     sprite,
                     sprite.center_x,
-                    sprite.center_y + test_y,
-                    self.obstacles,
+                    sprite.center_y + test_y
                 ):
                     test_y += sign(sprite.y_vel)
                 else:
                     test_y -= sign(sprite.y_vel)
                     break
             sprite.center_y += test_y
-
-        if collision_check(
-            sprite, sprite.center_x, sprite.center_y, self.obstacles
-        ):
+            sprite.y_vel = 0
+        if len(arcade.check_for_collision_with_list(sprite, self.obstacles)) >= 1:
             sprite.center_x = failsafe_x
             sprite.center_y = failsafe_y
 
-    def collision_check(self,sprite, new_x, new_y):
+    def collision_check(self, sprite, new_x, new_y):
         """
         Better collision check which takes the projected location of a sprite instead of its actual location
         """
@@ -83,7 +79,7 @@ class PhysicsEngine:
         sprite.set_hit_box(tuple(translated_tuple_box))
         collide = len(arcade.check_for_collision_with_list(sprite, self.obstacles))
         sprite.set_hit_box(original_hit_box)
-        if collide:
+        if collide >= 1:
             return True
         else:
             return False

@@ -15,6 +15,7 @@ from constants.game import (
     SPRITE_SCALING,
 )
 from core.Enemies import Enemy
+from core.MouseCursor import MouseCursor
 from core.lerp import lerp
 from core.PlayerCharacter import PlayerCharacter
 
@@ -39,6 +40,9 @@ class GameResources:
         self.mouse_x = 0
         self.mouse_y = 0
 
+        # mouse cursor
+        self.mouse_cursor = MouseCursor()
+
         # camera behavior and follow location
         self.behavior = FOLLOW
         self.follow_x = PLAYER_DEFAULT_START[0]
@@ -57,6 +61,7 @@ class GameResources:
         self.floor_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
         self.enemy_list = arcade.SpriteList()
+        self.gui_list = arcade.SpriteList()
 
         # player
         self.player_sprite = PlayerCharacter(PLAYER_DEFAULT_START, self)
@@ -87,13 +92,19 @@ class GameResources:
             self.wall_list.append(wall1)
             self.wall_list.append(wall2)
 
+        self.gui_list.append(self.mouse_cursor)
+
     def on_draw(self):
         # draw all the lists
         self.wall_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        self.gui_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
 
     def on_update(self, delta_time):
+        # mouse cursor
+        self.mouse_cursor.center_x = self.mouse_x + self.view_left
+        self.mouse_cursor.center_y = self.mouse_y + self.view_bottom
         # camera scrolling
         self.follow_x = self.player_sprite.center_x
         self.follow_y = self.player_sprite.center_y
@@ -117,14 +128,19 @@ class GameResources:
         else:
             self.shake_x = 0
             self.shake_y = 0
+            self.shake_strength = 0
 
         # clamp viewport to room
-        if not (0 < self.view_left < ROOM_WIDTH-SCREEN_WIDTH):
-            self.view_left = min(ROOM_WIDTH-SCREEN_WIDTH,self.view_left)
-            self.view_left = max(self.view_left,0)
-        if not (0 < self.view_bottom < ROOM_HEIGHT-SCREEN_HEIGHT):
-            self.view_bottom = min(ROOM_HEIGHT-SCREEN_HEIGHT,self.view_bottom)
-            self.view_bottom = max(self.view_bottom,0)
+        rightside_clamp = ROOM_WIDTH
+        leftside_clamp = 0
+        topside_clamp = ROOM_HEIGHT
+        bottom_clamp = 0
+        if not (0 < self.view_left + self.shake_x < rightside_clamp-SCREEN_WIDTH):
+            self.view_left = min(rightside_clamp-SCREEN_WIDTH-self.shake_x,self.view_left)
+            self.view_left = max(self.view_left,leftside_clamp-self.shake_x)
+        if not (0 < self.view_bottom + self.shake_y < topside_clamp-SCREEN_HEIGHT):
+            self.view_bottom = min(topside_clamp-SCREEN_HEIGHT-self.shake_y,self.view_bottom)
+            self.view_bottom = max(self.view_bottom,bottom_clamp-self.shake_y)
 
         arcade.set_viewport(
             self.view_left + self.shake_x,
@@ -132,6 +148,10 @@ class GameResources:
             self.view_bottom + self.shake_y,
             (SCREEN_HEIGHT) + self.view_bottom + self.shake_y,
         )
+
+    def screenshake(self, length, strength):
+        self.shake_remain = int(abs(length))
+        self.shake_strength = int(abs(strength))
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.F:
