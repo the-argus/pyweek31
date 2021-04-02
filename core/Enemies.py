@@ -83,6 +83,7 @@ class Jetpack(Enemy):
         self.floating_speed = FLOATING_SPEED
 
     def on_update(self, delta_time):
+        pass
         # move
         # if clear line of sight:
         #     move faster
