@@ -18,7 +18,7 @@ class PlayerCharacter(PhysicsSprite):
     def __init__(self, position, game_resources):
 
         # Set up parent class
-        super().__init__("resources/player_static.png",SPRITE_SCALING)
+        super().__init__("resources/player_static.png", SPRITE_SCALING)
         self.game_resources = game_resources
 
         self.load_textures()
@@ -134,9 +134,9 @@ class PlayerCharacter(PhysicsSprite):
         f_y = math.sin(dir) * self.press_force * is_moving
 
         # force from bouncing off enemies
-        enemy_hit_list = arcade.check_for_collision_with_list(self,self.game_resources.enemy_list)
+        enemy_hit_list = arcade.check_for_collision_with_list(self, self.game_resources.enemy_list)
         if len(enemy_hit_list):
-            self.game_resources.screenshake(4,3)
+            self.game_resources.screenshake(4, 3)
             hit_dir = math.atan2(self.center_y-enemy_hit_list[0].center_y, self.center_x-enemy_hit_list[0].center_x)
             enemy_reflect_y = sign(math.sin(hit_dir))*ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_y-self.center_y)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
             enemy_reflect_x = sign(math.cos(hit_dir))*ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_x-self.center_x)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
@@ -180,6 +180,8 @@ class PlayerCharacter(PhysicsSprite):
         # create final velocity with extra velocities added
         self.x_vel = self.x_player_vel + self.jetpack_x + self.x_vel_extra
         self.y_vel = self.y_player_vel + self.jetpack_y + self.y_vel_extra
+
+        # print(self.position)
 
     def clamp_speed(self, xspeed, yspeed, max_speed):
         vec2 = math.sqrt(xspeed**2 + yspeed**2)

@@ -5,20 +5,20 @@ import arcade
 
 from constants.game import (GRID_SIZE, ROOM_HEIGHT, ROOM_WIDTH,
                             SPRITE_IMAGE_SIZE, SPRITE_SCALING)
-from constants.physics import PLAYER_MASS, PLAYER_SPEED
+from constants.physics import PLAYER_MASS, ENEMY_SPEED
 from core.PhysicsSprite import PhysicsSprite
+from core.physics_engine import PhysicsEngine
 from core.sign import sign
 
 
 class Enemy(PhysicsSprite):
-    """ Player Sprite"""
+    """ Enemy Sprite"""
 
     def __init__(self, position, game_resources):
 
         # Set up parent class
         super().__init__("resources/enemy_static.png", SPRITE_SCALING)
         self.game_resources = game_resources
-        self.speed = PLAYER_SPEED
         self.wall_list = game_resources.wall_list
         self.player = game_resources.player_sprite
         self.path = None
@@ -45,9 +45,12 @@ class Enemy(PhysicsSprite):
 
     def on_update(self, delta_time):
         if self.path is not None and self.path:
-            self.center_x = self.path[0][0]
-            self.center_y = self.path[0][1]
-            self.path.pop(0)
+            direction = math.atan2(self.path[0][1] - self.center_y, self.path[0][0] - self.center_x)
+            print(direction)
+            self.x_vel = math.cos(direction) * ENEMY_SPEED
+            self.y_vel = math.sin(direction) * ENEMY_SPEED
+            if math.sqrt((self.path[0][0] - self.center_x) ** 2 + (self.path[0][1] - self.center_y) ** 2) < GRID_SIZE / 2 - 1:
+                self.path.pop(0)
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/enemy_static.png", self.scale)

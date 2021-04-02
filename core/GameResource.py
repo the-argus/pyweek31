@@ -63,7 +63,7 @@ class GameResources:
         self.player_list.append(self.player_sprite)
 
         # enemies
-        for i in range(10):
+        for i in range(1):
             created = self.spawn_new_enemy()
             if not created:
                 i -= 1
@@ -179,7 +179,7 @@ class GameResources:
             self.enemy_sprite = Jetpack((start_x, start_y), self)
 
         for wall in self.wall_list:
-            if len(arcade.check_for_collision_with_list(self.enemy_sprite, self.wall_list)) >= 1:
+            if len(arcade.check_for_collision_with_list(self.enemy_sprite, self.wall)) >= 1:
                 flag = False
         if (
             self.calculate_distance_from_player(start_x, start_y) > SPAWN_RADIUS

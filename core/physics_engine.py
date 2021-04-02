@@ -5,6 +5,7 @@ from core.dot_product import dot_product
 from core.sign import sign
 from constants.game import SPRITE_IMAGE_SIZE
 
+
 class PhysicsEngine:
     """
     Handles the speeds and collisions of enemies and the player
@@ -12,11 +13,11 @@ class PhysicsEngine:
     def __init__(self):
         self.obstacles = []
 
-    def set_obstacles(self,wall_list):
+    def set_obstacles(self, wall_list):
         # used by GameInstance to update any changes in walls
         self.obstacles = wall_list
 
-    def move_sprite(self,sprite,delta_time):
+    def move_sprite(self, sprite, delta_time):
         failsafe_x = sprite.center_x
         failsafe_y = sprite.center_y
 

@@ -4,7 +4,7 @@ SCREEN_WIDTH = 640
 SCREEN_HEIGHT = 360
 
 ROOM_WIDTH = 24*32
-ROOM_HEIGHT = 24*18 #height is 16:9 ratio with width
+ROOM_HEIGHT = 24*18  # height is 16:9 ratio with width
 SPAWN_RADIUS = 120
 
 GRID_SIZE = 64
