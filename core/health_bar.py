@@ -25,7 +25,7 @@ class HealthBar:
                 center_x=health_x,
                 center_y=health_y + HEALTHBAR_OFFSET_Y,
                 width=HEALTHBAR_WIDTH,
-                height=3,
+                height=HEALTHBAR_HEIGHT,
                 color=arcade.color.RED,
             )
 

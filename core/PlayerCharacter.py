@@ -58,6 +58,8 @@ class PlayerCharacter(Animated):
             self.left_pressed = True
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = True
+        elif key == arcade.key.H:
+            self.health.cur_health -= 1
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
