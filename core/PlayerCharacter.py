@@ -4,8 +4,10 @@ import arcade
 
 from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING, JETPACK, MAXFUEL, FUEL_REGENERATION_TIME
 from constants.physics import PLAYER_MASS, PLAYER_SPEED, JETPACK_FORCE, PLAYER_FRICTION, GRAVITY
+from core.animated import Animated
 from constants.enemies import ENEMY_BOUNCE, ENEMY_SPRITE_WIDTH
 from core.PhysicsSprite import PhysicsSprite
+from core.health_bar import HealthBar
 from core.sign import sign
 from core.dot_product import dot_product
 
@@ -22,6 +24,8 @@ class PlayerCharacter(PhysicsSprite):
         self.load_textures()
 
         self.scale = SPRITE_SCALING
+
+        self.health = HealthBar(100, game_resources)
 
         self.up_pressed = False
         self.down_pressed = False
@@ -60,9 +64,6 @@ class PlayerCharacter(PhysicsSprite):
     def on_mouse_press(self, x, y, button, modifiers):
         pass
 
-    def update_animation(self, delta_time: float = 1 / 60):
-        pass
-
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
         if key == arcade.key.UP or key == arcade.key.W:
@@ -90,12 +91,20 @@ class PlayerCharacter(PhysicsSprite):
         elif key == arcade.key.SPACE:
             self.activated = False
 
+    def on_draw(self):
+        # draw heathbar
+        self.health.draw_health_bar()
+
     def on_update(self, delta_time):
         #update jetpack fuel
         self.fuel_tick += 1*(self.fuel < MAXFUEL)
         if self.fuel_tick > self.fuel_gen:
             self.fuel_tick = 0
             self.fuel_changed(1)
+
+        # update animation
+        self.animate(delta_time)
+
         # force from pressing buttons
         in_x = self.right_pressed - self.left_pressed
         in_y = self.up_pressed - self.down_pressed
@@ -175,3 +184,7 @@ class PlayerCharacter(PhysicsSprite):
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
+        self.idle_textures(["player_static.png", "player_static_alt.png"])
+        self.walk_textures(
+            ["player_static.png", "player_static_alt.png", "player_static_original.png"]
+        )
