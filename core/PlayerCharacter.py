@@ -2,7 +2,7 @@ import math
 
 import arcade
 
-from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING, JETPACK, MAXFUEL, FUEL_REGENERATION_TIME
+from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING, JETPACK, MAXFUEL, FUEL_REGENERATION_TIME, JETPACK_BURST_LENGTH, JETPACK_BURST_COOLDOWN, JETPACK_DISTANCE_SCALE, MAX_JETPACK_SPEED
 from constants.physics import PLAYER_MASS, PLAYER_SPEED, JETPACK_FORCE, PLAYER_FRICTION, GRAVITY
 from core.animated import Animated
 from constants.enemies import ENEMY_BOUNCE, ENEMY_SPRITE_WIDTH
@@ -49,14 +49,17 @@ class PlayerCharacter(PhysicsSprite):
 
         # gadget mode
         self.mode = JETPACK
+        self.cooldown = False
 
         # jetpack physics
         self.jetpack_x = 0
         self.jetpack_y = 0
-        self.max_jetpack_speed = 10
+        self.max_jetpack_speed = MAX_JETPACK_SPEED
         self.fuel = MAXFUEL
         self.fuel_tick = 0
         self.fuel_gen = FUEL_REGENERATION_TIME
+        self.jet_burst_tick = 0
+        self.jet_engaged = False
 
     def on_mouse_motion(self, x, y, dx, dy):
         pass
@@ -76,7 +79,8 @@ class PlayerCharacter(PhysicsSprite):
             self.right_pressed = True
         elif key == arcade.key.SPACE:
             self.activated = True
-            self.fuel_changed(-1)
+            if not self.cooldown:
+                self.fuel_changed(-1)
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
@@ -96,7 +100,20 @@ class PlayerCharacter(PhysicsSprite):
         self.health.draw_health_bar()
 
     def on_update(self, delta_time):
-        #update jetpack fuel
+        # update jetpack burst
+        if self.jet_burst_tick > 0:
+            self.jet_burst_tick -= 1
+            if self.jet_burst_tick <= 0:
+                self.jet_burst_tick = -JETPACK_BURST_COOLDOWN
+                self.jet_engaged = False
+                self.cooldown = True
+        elif self.jet_burst_tick < 0:
+            self.jet_burst_tick += 1
+            if self.jet_burst_tick >= 0:
+                self.jet_burst_tick = 0
+                self.cooldown = False
+
+        # update jetpack fuel
         self.fuel_tick += 1*(self.fuel < MAXFUEL)
         if self.fuel_tick > self.fuel_gen:
             self.fuel_tick = 0
@@ -119,7 +136,7 @@ class PlayerCharacter(PhysicsSprite):
         # force from bouncing off enemies
         enemy_hit_list = arcade.check_for_collision_with_list(self,self.game_resources.enemy_list)
         if len(enemy_hit_list):
-            self.game_resources.screenshake(10,5)
+            self.game_resources.screenshake(4,3)
             hit_dir = math.atan2(self.center_y-enemy_hit_list[0].center_y, self.center_x-enemy_hit_list[0].center_x)
             enemy_reflect_y = sign(math.sin(hit_dir))*ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_y-self.center_y)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
             enemy_reflect_x = sign(math.cos(hit_dir))*ENEMY_BOUNCE*(1-(enemy_hit_list[0].center_x-self.center_x)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
@@ -128,12 +145,12 @@ class PlayerCharacter(PhysicsSprite):
             enemy_reflect_x = 0
 
         # force from using the jetpack
-        if self.mode == JETPACK and self.activated:
+        if self.mode == JETPACK and self.jet_engaged and self.activated:
             mouse_dir = math.atan2(self.game_resources.mouse_y+self.game_resources.view_bottom-self.center_y, self.game_resources.mouse_x+self.game_resources.view_left-self.center_x)
             mouse_dist = math.sqrt((self.game_resources.mouse_x+self.game_resources.view_left-self.center_x)**2 + (self.game_resources.mouse_y+self.game_resources.view_bottom-self.center_y)**2)
-            dist_scale = (math.log(mouse_dist+1)/math.e)
-            jx_force = JETPACK_FORCE * math.cos(mouse_dir) * dist_scale
-            jy_force = JETPACK_FORCE * math.sin(mouse_dir) * dist_scale
+            dist_scale = JETPACK_FORCE * self.jetpack_distance_scaling(mouse_dist)
+            jx_force = math.cos(mouse_dir) * dist_scale
+            jy_force = math.sin(mouse_dir) * dist_scale
         else:
             jx_force = 0
             jy_force = 0
@@ -175,12 +192,18 @@ class PlayerCharacter(PhysicsSprite):
             return (xspeed,yspeed)
 
     def fuel_changed(self,fuel):
+        if fuel < 0 and self.fuel >= 1:
+            self.jet_burst_tick = JETPACK_BURST_LENGTH
+            self.jet_engaged = True
         self.fuel += fuel
         if self.fuel > MAXFUEL:
             self.fuel = MAXFUEL
         if self.fuel < 0:
             self.fuel = 0
         self.game_resources.mouse_cursor.set_cursor(self.fuel)
+
+    def jetpack_distance_scaling(self, val):
+        return (2/(1+math.pow(math.e,-abs(val)*JETPACK_DISTANCE_SCALE)) - 1)
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
