@@ -15,7 +15,7 @@ from constants.game import (
     SPRITE_SCALING,
     GRID_SIZE
 )
-from core.Enemies import Enemy
+from core.Enemies import Default, Jetpack
 from core.lerp import lerp
 from core.PlayerCharacter import PlayerCharacter
 
@@ -58,7 +58,7 @@ class GameResources:
         self.player_list.append(self.player_sprite)
 
         # enemies
-        for i in range(3):
+        for i in range(5):
             created = self.spawn_new_enemy()
             if not created:
                 i -= 1
@@ -87,8 +87,8 @@ class GameResources:
     def on_draw(self):
         # draw all the lists
         self.wall_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
-        self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
 
     def on_update(self, delta_time):
         # camera scrolling
@@ -142,7 +142,12 @@ class GameResources:
         start_x = random.randint(0, ROOM_WIDTH)
         start_y = random.randint(0, ROOM_HEIGHT)
         flag = True
-        self.enemy_sprite = Enemy((start_x, start_y), self)
+
+        type = random.randint(0, 1)
+        if type == 0:
+            self.enemy_sprite = Default((start_x, start_y), self)
+        elif type == 1:
+            self.enemy_sprite = Jetpack((start_x, start_y), self)
         for wall in self.wall_list:
             if arcade.check_for_collision(self.enemy_sprite, wall):
                 flag = False
