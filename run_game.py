@@ -29,7 +29,9 @@ class GameWindow(arcade.Window):
         # Save original size when we exit fullscreen
         self.original_size = self.get_size()
         # screensize multiplier so that the viewport gets scaled up in fullscreen
-        self.screensize_multiplier = arcade.window_commands.get_display_size()[0]/SCREEN_WIDTH
+        self.screensize_multiplier = (
+            arcade.window_commands.get_display_size()[0] / SCREEN_WIDTH
+        )
 
     def setup(self):
         """ Set up everything with the game """

@@ -64,5 +64,4 @@ class GameInstance:
         self.physics_engine.move_sprite(self.game_resources.player_sprite, delta_time)
 
         for sprite in self.game_resources.enemy_list:
-            sprite.calculate_astar()
             self.physics_engine.move_sprite(sprite, delta_time)

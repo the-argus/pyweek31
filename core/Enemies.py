@@ -5,9 +5,9 @@ import arcade
 
 from constants.game import (GRID_SIZE, ROOM_HEIGHT, ROOM_WIDTH,
                             SPRITE_IMAGE_SIZE, SPRITE_SCALING)
-from constants.physics import PLAYER_MASS, ENEMY_SPEED
-from core.PhysicsSprite import PhysicsSprite
+from constants.physics import ENEMY_SPEED, PLAYER_MASS
 from core.physics_engine import PhysicsEngine
+from core.PhysicsSprite import PhysicsSprite
 from core.sign import sign
 
 
@@ -31,26 +31,40 @@ class Enemy(PhysicsSprite):
         self.center_y = position[1]
 
         self.path = [
-            self.game_resources.player_sprite.center_x,
-            self.game_resources.player_sprite.center_y,
+            (
+                self.game_resources.player_sprite.center_x,
+                self.game_resources.player_sprite.center_y,
+            )
         ]
 
         self.barrier_list = arcade.AStarBarrierList(
             self, self.wall_list, GRID_SIZE, 0, ROOM_WIDTH, 0, ROOM_HEIGHT
         )
-        self.calculate_astar()
 
     def update_animation(self, delta_time: float = 1 / 60):
         pass
 
     def on_update(self, delta_time):
-        if self.path is not None and self.path:
-            direction = math.atan2(self.path[0][1] - self.center_y, self.path[0][0] - self.center_x)
-            print(direction)
-            self.x_vel = math.cos(direction) * ENEMY_SPEED
-            self.y_vel = math.sin(direction) * ENEMY_SPEED
-            if math.sqrt((self.path[0][0] - self.center_x) ** 2 + (self.path[0][1] - self.center_y) ** 2) < GRID_SIZE / 2 - 1:
-                self.path.pop(0)
+        self.calculate_astar()
+
+        if self.path:
+            self.path.pop(0)
+
+        if len(self.path) > 1:
+
+            if self.center_x < self.path[1][0]:
+                x_speed = ENEMY_SPEED
+            else:
+                x_speed = -ENEMY_SPEED
+            if self.center_y < self.path[1][1]:
+                y_speed = ENEMY_SPEED
+            else:
+                y_speed = -ENEMY_SPEED
+
+            self.y_vel = y_speed
+            self.x_vel = x_speed
+
+            self.path.pop(0)
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/enemy_static.png", self.scale)
@@ -62,10 +76,8 @@ class Enemy(PhysicsSprite):
             self.barrier_list,
             diagonal_movement=False,
         )
-        # print(f"X{self.center_x} Y{self.center_y}")
-        # print(self.path)
 
-    def on_draw(self):
+    def draw_path(self):
         if self.path:
             arcade.draw_line_strip(self.path, arcade.color.BLUE, 2)
 

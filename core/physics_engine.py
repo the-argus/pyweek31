@@ -1,15 +1,17 @@
-import arcade
 import math
 
+import arcade
+
+from constants.game import SPRITE_IMAGE_SIZE
 from core.dot_product import dot_product
 from core.sign import sign
-from constants.game import SPRITE_IMAGE_SIZE
 
 
 class PhysicsEngine:
     """
     Handles the speeds and collisions of enemies and the player
     """
+
     def __init__(self):
         self.obstacles = []
 
@@ -22,18 +24,14 @@ class PhysicsEngine:
         failsafe_y = sprite.center_y
 
         if not self.collision_check(
-            sprite,
-            sprite.center_x + sprite.x_vel,
-            sprite.center_y
+            sprite, sprite.center_x + sprite.x_vel, sprite.center_y
         ):
             sprite.center_x += sprite.x_vel * delta_time / 0.05
         else:
             test_x = 0
             for i in range(math.ceil(abs(sprite.x_vel))):
                 if not self.collision_check(
-                    sprite,
-                    sprite.center_x + test_x,
-                    sprite.center_y
+                    sprite, sprite.center_x + test_x, sprite.center_y
                 ):
                     test_x += sign(sprite.x_vel)
                 else:
@@ -42,18 +40,14 @@ class PhysicsEngine:
             sprite.center_x += test_x
             sprite.x_vel = 0
         if not self.collision_check(
-            sprite,
-            sprite.center_x,
-            sprite.center_y + sprite.y_vel
+            sprite, sprite.center_x, sprite.center_y + sprite.y_vel
         ):
             sprite.center_y += sprite.y_vel * delta_time / 0.05
         else:
             test_y = 0
             for i in range(math.ceil(abs(sprite.y_vel))):
                 if not self.collision_check(
-                    sprite,
-                    sprite.center_x,
-                    sprite.center_y + test_y
+                    sprite, sprite.center_x, sprite.center_y + test_y
                 ):
                     test_y += sign(sprite.y_vel)
                 else:
@@ -90,17 +84,27 @@ class PhysicsEngine:
         bounces sprite one off of sprite two (reflects velocity)
         """
         # Use normal (x,y) tuple to reflect a speed vector
-        reflect = [None,None]
-        normal = get_normal(sprite1,sprite2)
-        prod = 2*dot_product(normal,speed)
-        r = [normal[0]*prod,normal[1]*prod]
-        reflect[0] = -r[0]+speed[0]
-        reflect[1] = -r[1]+speed[1]
+        reflect = [None, None]
+        normal = get_normal(sprite1, sprite2)
+        prod = 2 * dot_product(normal, speed)
+        r = [normal[0] * prod, normal[1] * prod]
+        reflect[0] = -r[0] + speed[0]
+        reflect[1] = -r[1] + speed[1]
         return tuple(reflect)
-        #Reflection = 2 * (normal dot velocity) * normal - velocity
+        # Reflection = 2 * (normal dot velocity) * normal - velocity
 
     def get_normal(self, sprite1, sprite2):
-        hit_dir = math.atan2(sprite1.center_y-sprite2.center_y, sprite1.center_x-sprite2.center_x)
-        rx = sign(math.sin(hit_dir))*(1-(enemy_hit_list[0].center_y-self.center_y)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
-        ry = sign(math.cos(hit_dir))*(1-(enemy_hit_list[0].center_x-self.center_x)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
-        return (rx,ry)
+        hit_dir = math.atan2(
+            sprite1.center_y - sprite2.center_y, sprite1.center_x - sprite2.center_x
+        )
+        rx = sign(math.sin(hit_dir)) * (
+            1
+            - (enemy_hit_list[0].center_y - self.center_y)
+            / ((SPRITE_IMAGE_SIZE * math.sqrt(2)) * 2)
+        )
+        ry = sign(math.cos(hit_dir)) * (
+            1
+            - (enemy_hit_list[0].center_x - self.center_x)
+            / ((SPRITE_IMAGE_SIZE * math.sqrt(2)) * 2)
+        )
+        return (rx, ry)

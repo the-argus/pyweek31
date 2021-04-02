@@ -9,9 +9,9 @@ from constants.enemies import SPAWN_RADIUS
 from constants.game import (GRID_SIZE, PLAYER_DEFAULT_START, ROOM_HEIGHT,
                             ROOM_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH,
                             SPRITE_SCALING)
-from core.Enemies import Jetpack, Default
-from core.MouseCursor import MouseCursor
+from core.Enemies import Default, Jetpack
 from core.lerp import lerp
+from core.MouseCursor import MouseCursor
 from core.PlayerCharacter import PlayerCharacter
 
 
@@ -63,7 +63,7 @@ class GameResources:
         self.player_list.append(self.player_sprite)
 
         # enemies
-        for i in range(1):
+        for i in range(2):
             created = self.spawn_new_enemy()
             if not created:
                 i -= 1
@@ -98,6 +98,8 @@ class GameResources:
         self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.gui_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        for enemy in self.enemy_list:
+            enemy.draw_path()
 
     def on_update(self, delta_time):
         # mouse cursor
@@ -137,12 +139,16 @@ class GameResources:
         leftside_clamp = 0
         topside_clamp = ROOM_HEIGHT
         bottom_clamp = 0
-        if not (0 < self.view_left + self.shake_x < rightside_clamp-SCREEN_WIDTH):
-            self.view_left = min(rightside_clamp-SCREEN_WIDTH-self.shake_x,self.view_left)
-            self.view_left = max(self.view_left,leftside_clamp-self.shake_x)
-        if not (0 < self.view_bottom + self.shake_y < topside_clamp-SCREEN_HEIGHT):
-            self.view_bottom = min(topside_clamp-SCREEN_HEIGHT-self.shake_y,self.view_bottom)
-            self.view_bottom = max(self.view_bottom,bottom_clamp-self.shake_y)
+        if not (0 < self.view_left + self.shake_x < rightside_clamp - SCREEN_WIDTH):
+            self.view_left = min(
+                rightside_clamp - SCREEN_WIDTH - self.shake_x, self.view_left
+            )
+            self.view_left = max(self.view_left, leftside_clamp - self.shake_x)
+        if not (0 < self.view_bottom + self.shake_y < topside_clamp - SCREEN_HEIGHT):
+            self.view_bottom = min(
+                topside_clamp - SCREEN_HEIGHT - self.shake_y, self.view_bottom
+            )
+            self.view_bottom = max(self.view_bottom, bottom_clamp - self.shake_y)
 
         arcade.set_viewport(
             self.view_left + self.shake_x,
@@ -168,8 +174,8 @@ class GameResources:
             )
 
     def spawn_new_enemy(self):
-        start_x = random.randint(0, ROOM_WIDTH)
-        start_y = random.randint(0, ROOM_HEIGHT)
+        start_x = random.randint(10, ROOM_WIDTH)
+        start_y = random.randint(10, ROOM_HEIGHT)
         flag = True
         type = random.randint(0, 1)
 
@@ -179,7 +185,10 @@ class GameResources:
             self.enemy_sprite = Jetpack((start_x, start_y), self)
 
         for wall in self.wall_list:
-            if len(arcade.check_for_collision_with_list(self.enemy_sprite, self.wall)) >= 1:
+            if (
+                len(arcade.check_for_collision_with_list(self.enemy_sprite, self.wall))
+                >= 1
+            ):
                 flag = False
         if (
             self.calculate_distance_from_player(start_x, start_y) > SPAWN_RADIUS

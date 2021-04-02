@@ -11,6 +11,15 @@ class HealthBar:
         self.max_health = max_health
         self.cur_health = max_health
         self.game_resources = game_resources
+        self.dead = False
+
+    def hurt(self, amount=5):
+        if self.cur_health > 0 and not self.dead:
+            self.cur_health -= amount
+
+    def heal(self, amount=5):
+        if self.cur_health < self.max_health and not self.dead:
+            self.cur_health += amount
 
     def draw_health_bar(self):
         """ Draw the health bar """
