@@ -1,10 +1,11 @@
 import math
-import arcade
 import time
 
-from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
+import arcade
+
+from constants.game import (GRID_SIZE, ROOM_HEIGHT, ROOM_WIDTH,
+                            SPRITE_IMAGE_SIZE, SPRITE_SCALING)
 from constants.physics import PLAYER_DRAG, PLAYER_MASS, PLAYER_SPEED
-from constants.game import ROOM_HEIGHT, ROOM_WIDTH, GRID_SIZE
 from core.collision_check import collision_check
 from core.sign import sign
 

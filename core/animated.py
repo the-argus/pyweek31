@@ -1,12 +1,10 @@
-import arcade
 import os
+
+import arcade
+
+from constants.animation import (IDLE_CYCLE_LENGTH, LEFT_FACING, RIGHT_FACING,
+                                 WALK_CYCLE_LENGTH)
 from constants.game import PARENT_DIR
-from constants.animation import (
-    IDLE_CYCLE_LENGTH,
-    LEFT_FACING,
-    RIGHT_FACING,
-    WALK_CYCLE_LENGTH,
-)
 
 
 class Animated(arcade.Sprite):

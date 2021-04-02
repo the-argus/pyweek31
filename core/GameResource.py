@@ -6,15 +6,9 @@ import arcade
 
 from constants.camera import FOLLOW, IDLE, LERP_MARGIN, LERP_SPEED
 from constants.enemies import SPAWN_RADIUS
-from constants.game import (
-    PLAYER_DEFAULT_START,
-    ROOM_HEIGHT,
-    ROOM_WIDTH,
-    SCREEN_HEIGHT,
-    SCREEN_WIDTH,
-    SPRITE_SCALING,
-    GRID_SIZE,
-)
+from constants.game import (GRID_SIZE, PLAYER_DEFAULT_START, ROOM_HEIGHT,
+                            ROOM_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH,
+                            SPRITE_SCALING)
 from core.Enemies import Enemy
 from core.lerp import lerp
 from core.PlayerCharacter import PlayerCharacter
@@ -89,7 +83,7 @@ class GameResources:
     def on_draw(self):
         # draw all the lists
         self.wall_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
-        self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        self.player_sprite.on_draw()
         self.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
 
     def on_update(self, delta_time):

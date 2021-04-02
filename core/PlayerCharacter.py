@@ -1,11 +1,13 @@
 import math
+
 import arcade
 
 from constants.game import SPRITE_IMAGE_SIZE, SPRITE_SCALING
 from constants.physics import PLAYER_DRAG, PLAYER_MASS, PLAYER_SPEED
-from core.collision_check import collision_check
-from core.sign import sign
 from core.animated import Animated
+from core.collision_check import collision_check
+from core.health_bar import HealthBar
+from core.sign import sign
 
 
 class PlayerCharacter(Animated):
@@ -21,6 +23,8 @@ class PlayerCharacter(Animated):
         self.load_textures()
 
         self.scale = SPRITE_SCALING
+
+        self.health = HealthBar(100, game_resources)
 
         self.up_pressed = False
         self.down_pressed = False
@@ -44,9 +48,6 @@ class PlayerCharacter(Animated):
     def on_mouse_press(self, x, y, button, modifiers):
         pass
 
-    def update_animation(self, delta_time: float = 1 / 60):
-        pass
-
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
         if key == arcade.key.UP or key == arcade.key.W:
@@ -57,6 +58,8 @@ class PlayerCharacter(Animated):
             self.left_pressed = True
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = True
+        elif key == arcade.key.H:
+            self.health.cur_health -= 1
 
     def on_key_release(self, key, modifiers):
         """Called when the user releases a key. """
@@ -68,6 +71,11 @@ class PlayerCharacter(Animated):
             self.left_pressed = False
         elif key == arcade.key.RIGHT or key == arcade.key.D:
             self.right_pressed = False
+
+    def on_draw(self):
+        # draw heathbar
+        self.draw()
+        self.health.draw_health_bar()
 
     def on_update(self, delta_time):
 
