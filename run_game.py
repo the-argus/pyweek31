@@ -40,7 +40,7 @@ class GameWindow(arcade.Window):
         self.game_instance = GameInstance(self)
 
         # Set the background color
-        arcade.set_background_color(arcade.color.AMAZON)
+        # arcade.set_background_color(arcade.color.AMAZON)
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """

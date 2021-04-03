@@ -6,9 +6,16 @@ import arcade
 
 from constants.camera import FOLLOW, IDLE, LERP_MARGIN, LERP_SPEED
 from constants.enemies import SPAWN_RADIUS
-from constants.game import (GRID_SIZE, PLAYER_DEFAULT_START, ROOM_HEIGHT,
-                            ROOM_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH,
-                            SPRITE_SCALING)
+from constants.game import (
+    GRID_SIZE,
+    PLAYER_DEFAULT_START,
+    ROOM_HEIGHT,
+    ROOM_WIDTH,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    SPRITE_SCALING,
+    TILE_SPRITE_SCALING,
+)
 from core.Enemies import Default, Jetpack
 from core.lerp import lerp
 from core.MouseCursor import MouseCursor
@@ -63,11 +70,12 @@ class GameResources:
         self.player_list.append(self.player_sprite)
 
         # enemies
-        for i in range(2):
+        for i in range(0):
             created = self.spawn_new_enemy()
             if not created:
                 i -= 1
-
+        self.load_level()
+        """
         # placeholder room
         for i in range(int(ROOM_HEIGHT / 16)):
             wall1 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
@@ -88,11 +96,12 @@ class GameResources:
             wall2.center_y = ROOM_HEIGHT - 8
             self.wall_list.append(wall1)
             self.wall_list.append(wall2)
-
+        """
         self.gui_list.append(self.mouse_cursor)
 
     def on_draw(self):
         # draw all the lists
+        self.floor_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.wall_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.player_sprite.on_draw()
         self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
@@ -207,3 +216,31 @@ class GameResources:
     def on_mouse_motion(self, x, y, dx, dy):
         self.mouse_x = x
         self.mouse_y = y
+
+    def load_level(self):
+        # Read in the tiled map
+        my_map = arcade.tilemap.read_tmx("2DMLDUNG1_v1.0/testmap.tmx")
+
+        # --- Walls ---
+
+        # Calculate the right edge of the my_map in pixels
+        self.end_of_map = my_map.map_size.width * GRID_SIZE
+
+        # Grab the layer of items we can't move through
+        self.wall_list = arcade.tilemap.process_layer(
+            my_map, "walls", TILE_SPRITE_SCALING
+        )
+
+        self.floor_list = arcade.tilemap.process_layer(
+            my_map, "floor", TILE_SPRITE_SCALING
+        )
+
+        # --- Other stuff
+        # Set the background color
+        if my_map.background_color:
+            arcade.set_background_color(my_map.background_color)
+
+        # Set the view port boundaries
+        # These numbers set where we have 'scrolled' to.
+        self.view_left = 0
+        self.view_bottom = 0
