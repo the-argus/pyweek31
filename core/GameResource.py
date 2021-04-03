@@ -62,6 +62,7 @@ class GameResources:
 
         # player
         self.player_sprite = PlayerCharacter(PLAYER_DEFAULT_START, self)
+        self.player_sprite.register_sprite_list(self.player_list)
         self.player_list.append(self.player_sprite)
 
         # enemies
@@ -78,6 +79,8 @@ class GameResources:
             wall1.center_y = (i * 16) + 8
             wall2.center_x = ROOM_WIDTH - 8
             wall2.center_y = (i * 16) + 8
+            wall1.register_sprite_list(self.wall_list)
+            wall2.register_sprite_list(self.wall_list)
             self.wall_list.append(wall1)
             self.wall_list.append(wall2)
 
@@ -88,10 +91,13 @@ class GameResources:
             wall1.center_y = 8
             wall2.center_x = (i * 16) + 8
             wall2.center_y = ROOM_HEIGHT - 8
+            wall1.register_sprite_list(self.wall_list)
+            wall2.register_sprite_list(self.wall_list)
             self.wall_list.append(wall1)
             self.wall_list.append(wall2)
 
         self.gui_list.append(self.mouse_cursor)
+        self.mouse_cursor.register_sprite_list(self.gui_list)
 
     def on_draw(self):
         # draw all the lists
@@ -184,6 +190,7 @@ class GameResources:
             self.calculate_distance_from_player(start_x, start_y) > SPAWN_RADIUS
             and flag
         ):
+            self.enemy_sprite.register_sprite_list(self.enemy_list)
             self.enemy_list.append(self.enemy_sprite)
             return True
         else:
@@ -191,6 +198,7 @@ class GameResources:
 
     def create_bullet(self, pos, vel, damage, speed_falloff, damage_falloff):
         new_bullet = Bullet(pos, vel, damage, speed_falloff, damage_falloff, self.game_instance.physics_engine, self)
+        new_bullet.register_sprite_list(self.bullet_list)
         self.bullet_list.append(new_bullet)
 
     def calculate_distance_from_player(self, enemy_x, enemy_y):
