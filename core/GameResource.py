@@ -6,12 +6,20 @@ import arcade
 
 from constants.camera import FOLLOW, IDLE, LERP_MARGIN, LERP_SPEED
 from constants.enemies import SPAWN_RADIUS
-from constants.game import (GRID_SIZE, PLAYER_DEFAULT_START, ROOM_HEIGHT,
-                            ROOM_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH,
-                            SPRITE_SCALING)
-from core.Enemies import Enemy
-from core.MouseCursor import MouseCursor
+from constants.game import (
+    GRID_SIZE,
+    PLAYER_DEFAULT_START,
+    ROOM_HEIGHT,
+    ROOM_WIDTH,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    SPRITE_SCALING,
+    TILE_SPRITE_SCALING,
+)
+from core.Enemies import Default, Jetpack
+from core.EnemyManager import EnemyManager
 from core.lerp import lerp
+from core.MouseCursor import MouseCursor
 from core.PlayerCharacter import PlayerCharacter
 from core.Bullet import Bullet
 
@@ -56,7 +64,7 @@ class GameResources:
         )  # contains all static objects which should have collision
         self.floor_list = arcade.SpriteList()
         self.player_list = arcade.SpriteList()
-        self.enemy_list = arcade.SpriteList()
+        self.enemy_list = EnemyManager(self)
         self.gui_list = arcade.SpriteList()
         self.bullet_list = arcade.SpriteList()
 
@@ -65,48 +73,26 @@ class GameResources:
         self.player_sprite.register_sprite_list(self.player_list)
         self.player_list.append(self.player_sprite)
 
+        self.load_level()
+
         # enemies
         for i in range(3):
-            created = self.spawn_new_enemy()
-            if not created:
-                i -= 1
-
-        # placeholder room
-        for i in range(int(ROOM_HEIGHT / 16)):
-            wall1 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
-            wall2 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
-            wall1.center_x = 8
-            wall1.center_y = (i * 16) + 8
-            wall2.center_x = ROOM_WIDTH - 8
-            wall2.center_y = (i * 16) + 8
-            wall1.register_sprite_list(self.wall_list)
-            wall2.register_sprite_list(self.wall_list)
-            self.wall_list.append(wall1)
-            self.wall_list.append(wall2)
-
-        for i in range(int(ROOM_WIDTH / 16)):
-            wall1 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
-            wall2 = arcade.Sprite("resources/wall_test.png", SPRITE_SCALING)
-            wall1.center_x = (i * 16) + 8
-            wall1.center_y = 8
-            wall2.center_x = (i * 16) + 8
-            wall2.center_y = ROOM_HEIGHT - 8
-            wall1.register_sprite_list(self.wall_list)
-            wall2.register_sprite_list(self.wall_list)
-            self.wall_list.append(wall1)
-            self.wall_list.append(wall2)
+            created = self.enemy_list.spawn_enemy()
 
         self.gui_list.append(self.mouse_cursor)
         self.mouse_cursor.register_sprite_list(self.gui_list)
 
     def on_draw(self):
         # draw all the lists
+        self.floor_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.wall_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.player_sprite.on_draw()
         self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.bullet_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
-        self.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        self.enemy_list.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.gui_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        for enemy in self.enemy_list.enemy_list:
+            enemy.draw_path()
 
     def on_update(self, delta_time):
         # mouse cursor
@@ -128,7 +114,7 @@ class GameResources:
             )
 
         self.player_sprite.on_update(delta_time)
-        for enemy_sprite in self.enemy_list:
+        for enemy_sprite in self.enemy_list.enemy_list:
             enemy_sprite.on_update(delta_time)
         for bullet_sprite in self.bullet_list:
             bullet_sprite.on_update(delta_time)
@@ -148,12 +134,16 @@ class GameResources:
         leftside_clamp = 0
         topside_clamp = ROOM_HEIGHT
         bottom_clamp = 0
-        if not (0 < self.view_left + self.shake_x < rightside_clamp-SCREEN_WIDTH):
-            self.view_left = min(rightside_clamp-SCREEN_WIDTH-self.shake_x,self.view_left)
-            self.view_left = max(self.view_left,leftside_clamp-self.shake_x)
-        if not (0 < self.view_bottom + self.shake_y < topside_clamp-SCREEN_HEIGHT):
-            self.view_bottom = min(topside_clamp-SCREEN_HEIGHT-self.shake_y,self.view_bottom)
-            self.view_bottom = max(self.view_bottom,bottom_clamp-self.shake_y)
+        if not (0 < self.view_left + self.shake_x < rightside_clamp - SCREEN_WIDTH):
+            self.view_left = min(
+                rightside_clamp - SCREEN_WIDTH - self.shake_x, self.view_left
+            )
+            self.view_left = max(self.view_left, leftside_clamp - self.shake_x)
+        if not (0 < self.view_bottom + self.shake_y < topside_clamp - SCREEN_HEIGHT):
+            self.view_bottom = min(
+                topside_clamp - SCREEN_HEIGHT - self.shake_y, self.view_bottom
+            )
+            self.view_bottom = max(self.view_bottom, bottom_clamp - self.shake_y)
 
         arcade.set_viewport(
             self.view_left + self.shake_x,
@@ -178,24 +168,6 @@ class GameResources:
                 self.view_bottom + self.shake_y + SCREEN_HEIGHT,
             )
 
-    def spawn_new_enemy(self):
-        start_x = random.randint(0, ROOM_WIDTH)
-        start_y = random.randint(0, ROOM_HEIGHT)
-        flag = True
-        self.enemy_sprite = Enemy((start_x, start_y), self)
-        for wall in self.wall_list:
-            if len(arcade.check_for_collision_with_list(self.enemy_sprite, self.wall_list)) >= 1:
-                flag = False
-        if (
-            self.calculate_distance_from_player(start_x, start_y) > SPAWN_RADIUS
-            and flag
-        ):
-            self.enemy_sprite.register_sprite_list(self.enemy_list)
-            self.enemy_list.append(self.enemy_sprite)
-            return True
-        else:
-            return False
-
     def create_bullet(self, pos, vel, damage, speed_falloff, damage_falloff):
         new_bullet = Bullet(pos, vel, damage, speed_falloff, damage_falloff, self.game_instance.physics_engine, self)
         new_bullet.register_sprite_list(self.bullet_list)
@@ -209,3 +181,32 @@ class GameResources:
     def on_mouse_motion(self, x, y, dx, dy):
         self.mouse_x = x
         self.mouse_y = y
+
+    def load_level(self):
+        # Read in the tiled map
+        path = os.path.join("2DMLDUNG1_v1.0","testmap.tmx")
+        my_map = arcade.tilemap.read_tmx(path)
+
+        # --- Walls ---
+
+        # Calculate the right edge of the my_map in pixels
+        self.end_of_map = my_map.map_size.width * GRID_SIZE
+
+        # Grab the layer of items we can't move through
+        self.wall_list = arcade.tilemap.process_layer(
+            my_map, "walls", TILE_SPRITE_SCALING
+        )
+
+        self.floor_list = arcade.tilemap.process_layer(
+            my_map, "floor", TILE_SPRITE_SCALING
+        )
+
+        # --- Other stuff
+        # Set the background color
+        if my_map.background_color:
+            arcade.set_background_color(my_map.background_color)
+
+        # Set the view port boundaries
+        # These numbers set where we have 'scrolled' to.
+        self.view_left = 0
+        self.view_bottom = 0
