@@ -57,6 +57,11 @@ class Enemy(PhysicsSprite):
 
         if len(self.path) > 1:
 
+            dir = math.atan2(self.path[1][1]-self.center_y, self.path[1][0]-self.center_x)
+            x_speed = math.cos(dir) * ENEMY_SPEED
+            y_speed = math.sin(dir) * ENEMY_SPEED
+
+            """
             if self.center_x < self.path[1][0]:
                 x_speed = ENEMY_SPEED
             else:
@@ -65,6 +70,7 @@ class Enemy(PhysicsSprite):
                 y_speed = ENEMY_SPEED
             else:
                 y_speed = -ENEMY_SPEED
+            """
 
             self.y_vel = y_speed
             self.x_vel = x_speed
