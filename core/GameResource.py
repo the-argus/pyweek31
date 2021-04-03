@@ -172,7 +172,8 @@ class GameResources:
 
     def load_level(self):
         # Read in the tiled map
-        my_map = arcade.tilemap.read_tmx("2DMLDUNG1_v1.0/testmap.tmx")
+        path = os.path.join("2DMLDUNG1_v1.0/testmap.tmx")
+        my_map = arcade.tilemap.read_tmx(path)
 
         # --- Walls ---
 
