@@ -1,13 +1,15 @@
 import arcade
+
 from constants.game import SPRITE_SCALING
+
 
 class MouseCursor(arcade.Sprite):
     def __init__(self):
         self.main_path = "resources/mouse/mouse_cursor"
-        super().__init__(f"{self.main_path}.png",SPRITE_SCALING)
+        super().__init__(f"{self.main_path}.png", SPRITE_SCALING)
         self.load_textures()
 
-    def set_cursor(self,fuel_level):
+    def set_cursor(self, fuel_level):
         if fuel_level == 1:
             self.texture = self.fuel_list[2]
         if fuel_level == 2:

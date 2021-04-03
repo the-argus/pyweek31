@@ -1,0 +1,9 @@
+import arcade
+
+DEFAULT_SCALE = 0.3
+DEFAULT_ALPHA = 32
+DEFAULT_PARTICLE_LIFETIME = 1.0
+DEFAULT_EMIT_INTERVAL = 0.003
+DEFAULT_EMIT_DURATION = 0.5
+
+TEXTURE = arcade.make_soft_circle_texture(70, arcade.color.RED)

@@ -61,7 +61,7 @@ class GameInstance:
 
         # update dynamic entities
         self.game_resources.player_sprite.on_update(delta_time)
-        self.physics_engine.move_sprite(self.game_resources.player_sprite,delta_time)
+        self.physics_engine.move_sprite(self.game_resources.player_sprite, delta_time)
 
-        for sprite in self.game_resources.enemy_list:
-            self.physics_engine.move_sprite(sprite,delta_time)
+        for sprite in self.game_resources.enemy_list.enemy_list:
+            self.physics_engine.move_sprite(sprite, delta_time)

@@ -29,7 +29,9 @@ class GameWindow(arcade.Window):
         # Save original size when we exit fullscreen
         self.original_size = self.get_size()
         # screensize multiplier so that the viewport gets scaled up in fullscreen
-        self.screensize_multiplier = arcade.window_commands.get_display_size()[0]/SCREEN_WIDTH
+        self.screensize_multiplier = (
+            arcade.window_commands.get_display_size()[0] / SCREEN_WIDTH
+        )
 
     def setup(self):
         """ Set up everything with the game """
@@ -38,7 +40,7 @@ class GameWindow(arcade.Window):
         self.game_instance = GameInstance(self)
 
         # Set the background color
-        arcade.set_background_color(arcade.color.AMAZON)
+        # arcade.set_background_color(arcade.color.AMAZON)
 
     def on_key_press(self, key, modifiers):
         """Called whenever a key is pressed. """
