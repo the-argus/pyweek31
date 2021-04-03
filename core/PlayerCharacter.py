@@ -3,24 +3,12 @@ import math
 import arcade
 
 from constants.enemies import ENEMY_BOUNCE, ENEMY_SPRITE_WIDTH
-from constants.game import (
-    FUEL_REGENERATION_TIME,
-    JETPACK,
-    JETPACK_BURST_COOLDOWN,
-    JETPACK_BURST_LENGTH,
-    JETPACK_DISTANCE_SCALE,
-    MAX_JETPACK_SPEED,
-    MAXFUEL,
-    SPRITE_IMAGE_SIZE,
-    SPRITE_SCALING,
-)
-from constants.physics import (
-    GRAVITY,
-    JETPACK_FORCE,
-    PLAYER_FRICTION,
-    PLAYER_MASS,
-    PLAYER_SPEED,
-)
+from constants.game import (FUEL_REGENERATION_TIME, JETPACK,
+                            JETPACK_BURST_COOLDOWN, JETPACK_BURST_LENGTH,
+                            JETPACK_DISTANCE_SCALE, MAX_JETPACK_SPEED, MAXFUEL,
+                            SPRITE_IMAGE_SIZE, SPRITE_SCALING)
+from constants.physics import (GRAVITY, JETPACK_FORCE, PLAYER_FRICTION,
+                               PLAYER_MASS, PLAYER_SPEED)
 from core.animated import Animated
 from core.dot_product import dot_product
 from core.health_bar import HealthBar
@@ -152,7 +140,7 @@ class PlayerCharacter(PhysicsSprite):
 
         # force from bouncing off enemies
         enemy_hit_list = arcade.check_for_collision_with_list(
-            self, self.game_resources.enemy_list
+            self, self.game_resources.enemy_list.enemy_list
         )
         if len(enemy_hit_list):
             self.health.hurt()

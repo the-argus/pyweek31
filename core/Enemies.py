@@ -3,13 +3,8 @@ import time
 
 import arcade
 
-from constants.game import (
-    GRID_SIZE,
-    ROOM_HEIGHT,
-    ROOM_WIDTH,
-    SPRITE_IMAGE_SIZE,
-    SPRITE_SCALING,
-)
+from constants.game import (GRID_SIZE, ROOM_HEIGHT, ROOM_WIDTH,
+                            SPRITE_IMAGE_SIZE, SPRITE_SCALING)
 from constants.physics import ENEMY_SPEED, PLAYER_MASS
 from core.physics_engine import PhysicsEngine
 from core.PhysicsSprite import PhysicsSprite

@@ -1,7 +1,8 @@
 import arcade
 
 from constants.game import SCREEN_HEIGHT, SCREEN_WIDTH
-from constants.health import HEALTHBAR_HEIGHT, HEALTHBAR_OFFSET_Y, HEALTHBAR_WIDTH
+from constants.health import (HEALTHBAR_HEIGHT, HEALTHBAR_OFFSET_Y,
+                              HEALTHBAR_WIDTH)
 
 
 class HealthBar:
