@@ -74,7 +74,7 @@ class GameResources:
 
         # enemies
         for i in range(3):
-            created = self.enemy_list.spawn_enemy()
+            self.enemy_list.spawn_enemy()
 
         self.gui_list.append(self.mouse_cursor)
 

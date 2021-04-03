@@ -51,6 +51,7 @@ class Enemy(PhysicsSprite):
 
     def on_update(self, delta_time):
         self.calculate_astar()
+        self.animate(delta_time)
 
         if self.path:
             self.path.pop(0)
@@ -77,9 +78,6 @@ class Enemy(PhysicsSprite):
 
             self.path.pop(0)
 
-    def load_textures(self):
-        self.sprite_base = arcade.Sprite("resources/enemy_static.png", self.scale)
-
     def calculate_astar(self):
         self.path = arcade.astar_calculate_path(
             self.position,
@@ -91,6 +89,21 @@ class Enemy(PhysicsSprite):
     def draw_path(self):
         if self.path:
             arcade.draw_line_strip(self.path, arcade.color.BLUE, 2)
+
+    def load_textures(self):
+        self.sprite_base = arcade.Sprite("resources/enemy_static.png", self.scale)
+        self.idle_textures([
+            "enemies/enemy_idle0.png",
+            "enemies/enemy_idle1.png",
+            "enemies/enemy_idle2.png",
+            "enemies/enemy_idle3.png"
+        ])
+        self.walk_textures([
+            "enemies/enemy_walk0.png",
+            "enemies/enemy_walk1.png",
+            "enemies/enemy_walk2.png",
+            "enemies/enemy_walk3.png"
+        ])
 
 
 class Default(Enemy):
@@ -109,3 +122,4 @@ class Jetpack(Enemy):
         #     move faster
         # if collision_check(self, 0, 0, self.wall_list):
         #     stun
+

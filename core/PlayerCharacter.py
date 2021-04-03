@@ -57,7 +57,7 @@ class PlayerCharacter(PhysicsSprite):
         self.friction = PLAYER_FRICTION
         self.press_force = PLAYER_SPEED
         self.max_extra_speed = 20
-        self.max_speed = 2
+        self.max_speed = 4
 
         self.x_player_vel = 0
         self.y_player_vel = 0
@@ -332,7 +332,15 @@ class PlayerCharacter(PhysicsSprite):
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
-        self.idle_textures(["player_static.png", "player_static_alt.png"])
-        self.walk_textures(
-            ["player_static.png", "player_static_alt.png", "player_static_original.png"]
-        )
+        self.idle_textures([
+            "player/player_idle0.png",
+            "player/player_idle1.png",
+            "player/player_idle2.png",
+            "player/player_idle3.png"
+        ])
+        self.walk_textures([
+            "player/player_walk0.png",
+            "player/player_walk1.png",
+            "player/player_walk2.png",
+            "player/player_walk3.png"
+        ])
