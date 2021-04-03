@@ -6,9 +6,16 @@ import arcade
 
 from constants.camera import FOLLOW, IDLE, LERP_MARGIN, LERP_SPEED
 from constants.enemies import SPAWN_RADIUS
-from constants.game import (GRID_SIZE, PLAYER_DEFAULT_START, ROOM_HEIGHT,
-                            ROOM_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH,
-                            SPRITE_SCALING, TILE_SPRITE_SCALING)
+from constants.game import (
+    GRID_SIZE,
+    PLAYER_DEFAULT_START,
+    ROOM_HEIGHT,
+    ROOM_WIDTH,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    SPRITE_SCALING,
+    TILE_SPRITE_SCALING,
+)
 from core.Enemies import Default, Jetpack
 from core.EnemyManager import EnemyManager
 from core.lerp import lerp
@@ -66,7 +73,7 @@ class GameResources:
         self.load_level()
 
         # enemies
-        for i in range(5):
+        for i in range(3):
             created = self.enemy_list.spawn_enemy()
 
         self.gui_list.append(self.mouse_cursor)

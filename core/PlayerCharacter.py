@@ -3,15 +3,28 @@ import math
 import arcade
 
 from constants.enemies import ENEMY_BOUNCE, ENEMY_SPRITE_WIDTH
-from constants.game import (FUEL_REGENERATION_TIME, JETPACK,
-                            JETPACK_BURST_COOLDOWN, JETPACK_BURST_LENGTH,
-                            JETPACK_DISTANCE_SCALE, MAX_JETPACK_SPEED, MAXFUEL,
-                            SPRITE_IMAGE_SIZE, SPRITE_SCALING)
-from constants.physics import (GRAVITY, JETPACK_FORCE, PLAYER_FRICTION,
-                               PLAYER_MASS, PLAYER_SPEED)
+from constants.game import (
+    FUEL_REGENERATION_TIME,
+    JETPACK,
+    JETPACK_BURST_COOLDOWN,
+    JETPACK_BURST_LENGTH,
+    JETPACK_DISTANCE_SCALE,
+    MAX_JETPACK_SPEED,
+    MAXFUEL,
+    SPRITE_IMAGE_SIZE,
+    SPRITE_SCALING,
+)
+from constants.physics import (
+    GRAVITY,
+    JETPACK_FORCE,
+    PLAYER_FRICTION,
+    PLAYER_MASS,
+    PLAYER_SPEED,
+)
 from core.animated import Animated
 from core.dot_product import dot_product
 from core.health_bar import HealthBar
+from core.particles import fire_emitter
 from core.PhysicsSprite import PhysicsSprite
 from core.sign import sign
 
@@ -50,6 +63,10 @@ class PlayerCharacter(PhysicsSprite):
         self.y_player_vel = 0
         self.x_vel_extra = 0
         self.y_vel_extra = 0
+
+        # Emitter
+        self.emitter = None
+        self.emitter_timeout = 0
 
         # gadget mode
         self.mode = JETPACK
@@ -100,10 +117,15 @@ class PlayerCharacter(PhysicsSprite):
             self.activated = False
 
     def on_draw(self):
+        # draw emitter
+        if self.emitter:
+            self.emitter.draw()
         # draw heathbar
         self.health.draw_health_bar()
 
     def on_update(self, delta_time):
+        if self.emitter:
+            self.emitter.update()
 
         # update jetpack burst
         if self.jet_burst_tick > 0:
@@ -112,6 +134,9 @@ class PlayerCharacter(PhysicsSprite):
                 self.jet_burst_tick = -JETPACK_BURST_COOLDOWN
                 self.jet_engaged = False
                 self.cooldown = True
+
+            self.run_emitter()
+
         elif self.jet_burst_tick < 0:
             self.jet_burst_tick += 1
             if self.jet_burst_tick >= 0:
@@ -265,6 +290,21 @@ class PlayerCharacter(PhysicsSprite):
         self.y_vel = self.y_player_vel + self.jetpack_y + self.y_vel_extra
 
         # print(self.position)
+
+    def run_emitter(self):
+        mouse_x = self.game_resources.mouse_cursor.center_x
+        mouse_y = self.game_resources.mouse_cursor.center_y
+        x_dis = abs(mouse_x - self.center_x)
+        y_dis = abs(mouse_y - self.center_y)
+        angle = math.degrees(math.atan2(y_dis, x_dis))
+
+        if mouse_x < self.center_x:
+            angle = 180 - angle
+        if mouse_y < self.center_y:
+            angle = 360 - angle
+        angle += 180
+
+        self.emitter = fire_emitter(self.position, angle)
 
     def clamp_speed(self, xspeed, yspeed, max_speed):
         vec2 = math.sqrt(xspeed ** 2 + yspeed ** 2)
