@@ -20,6 +20,8 @@ class PhysicsEngine:
         failsafe_x = sprite.center_x
         failsafe_y = sprite.center_y
 
+        collided = None
+
         if not self.collision_check(
             sprite,
             sprite.center_x + sprite.x_vel,
@@ -36,6 +38,8 @@ class PhysicsEngine:
                 ):
                     test_x += sign(sprite.x_vel)
                 else:
+                    test_x += sign(sprite.x_vel)
+                    collided = arcade.check_for_collision_with_list(sprite, self.obstacles)
                     test_x -= sign(sprite.x_vel)
                     break
             sprite.center_x += test_x
@@ -56,6 +60,8 @@ class PhysicsEngine:
                 ):
                     test_y += sign(sprite.y_vel)
                 else:
+                    test_y += sign(sprite.y_vel)
+                    collided = arcade.check_for_collision_with_list(sprite, self.obstacles)
                     test_y -= sign(sprite.y_vel)
                     break
             sprite.center_y += test_y
@@ -63,6 +69,9 @@ class PhysicsEngine:
         if len(arcade.check_for_collision_with_list(sprite, self.obstacles)) >= 1:
             sprite.center_x = failsafe_x
             sprite.center_y = failsafe_y
+        if collided is not None:
+            if len(collided) >= 1:
+                return collided[0]
 
     def collision_check(self, sprite, new_x, new_y):
         """
@@ -84,13 +93,16 @@ class PhysicsEngine:
         else:
             return False
 
-    def bounce(self, sprite1, sprite2, speed):
+    def bounce(self, sprite1, sprite2, speed, is_square):
         """
         bounces sprite one off of sprite two (reflects velocity)
         """
         # Use normal (x,y) tuple to reflect a speed vector
         reflect = [None,None]
-        normal = get_normal(sprite1,sprite2)
+        if is_square:
+            normal = self.get_square_normal(sprite1,sprite2)
+        else:
+            normal = self.get_normal(sprite1,sprite2)
         prod = 2*dot_product(normal,speed)
         r = [normal[0]*prod,normal[1]*prod]
         reflect[0] = -r[0]+speed[0]
@@ -103,3 +115,18 @@ class PhysicsEngine:
         rx = sign(math.sin(hit_dir))*(1-(enemy_hit_list[0].center_y-self.center_y)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
         ry = sign(math.cos(hit_dir))*(1-(enemy_hit_list[0].center_x-self.center_x)/((SPRITE_IMAGE_SIZE*math.sqrt(2))*2))
         return (rx,ry)
+
+    def get_square_normal(self, sprite1, sprite2):
+        hit_dir = math.atan2(sprite1.center_y-sprite2.center_y, sprite1.center_x-sprite2.center_x)
+        if hit_dir <= math.pi/4:
+            return (1, 0)
+        elif math.pi/4 > hit_dir >= math.pi*3/4:
+            return (0, 1)
+        elif math.pi*3/4 > hit_dir >= math.pi*5/4:
+            return (-1, 0)
+        elif math.pi*5/4 > hit_dir >= math.pi*7/4:
+            return (0, -1)
+        elif hit_dir > math.pi*7/4:
+            return (1, 0)
+        else:
+            return None
