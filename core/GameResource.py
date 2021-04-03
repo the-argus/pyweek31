@@ -172,7 +172,7 @@ class GameResources:
 
     def load_level(self):
         # Read in the tiled map
-        path = os.path.join("2DMLDUNG1_v1.0","testmap.tmx")
+        path = os.path.join("resources","GameMap.tmx")
         my_map = arcade.tilemap.read_tmx(path)
 
         # --- Walls ---
@@ -182,7 +182,7 @@ class GameResources:
 
         # Grab the layer of items we can't move through
         self.wall_list = arcade.tilemap.process_layer(
-            my_map, "walls", TILE_SPRITE_SCALING
+            my_map, "wall", TILE_SPRITE_SCALING
         )
 
         self.floor_list = arcade.tilemap.process_layer(
