@@ -77,14 +77,15 @@ class GameWindow(arcade.Window):
         self.game_instance.on_draw()
         text_size = 10
         margin = 2
-        arcade.draw_text(
-            "Press F to toggle between full screen and windowed mode",
-            (SCREEN_WIDTH // 2) + self.game_instance.game_resources.view_left,
-            margin + self.game_instance.game_resources.view_bottom,
-            arcade.color.WHITE,
-            text_size,
-            anchor_x="center",
-        )
+        if not self.game_instance.window.fullscreen:
+            arcade.draw_text(
+                "Press F to toggle between full screen and windowed mode",
+                (SCREEN_WIDTH // 2) + self.game_instance.game_resources.view_left,
+                margin + self.game_instance.game_resources.view_bottom,
+                arcade.color.WHITE,
+                text_size,
+                anchor_x="center",
+            )
 
 
 def main():

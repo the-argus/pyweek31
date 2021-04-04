@@ -13,6 +13,7 @@ from constants.game import (
 )
 from constants.physics import ENEMY_SPEED, PLAYER_MASS
 from core.physics_engine import PhysicsEngine
+from constants.enemies import SHOOTING, FOLLOWING, ENEMY_FIRERATE
 from core.PhysicsSprite import PhysicsSprite
 from core.sign import sign
 
@@ -28,6 +29,16 @@ class Enemy(PhysicsSprite):
         self.wall_list = game_resources.wall_list
         self.player = game_resources.player_sprite
         self.path = None
+
+        self.state = SHOOTING
+
+        # bullet characteristics
+        self.bullet_speed = 10
+        self.bullet_damage = 1
+        self.bullet_speed_falloff = 1
+        self.bullet_damage_falloff = 1
+
+        self.shot_cooldown = 0
 
         self.load_textures()
 
@@ -51,6 +62,9 @@ class Enemy(PhysicsSprite):
         pass
 
     def on_update(self, delta_time):
+        if self.shot_cooldown > 0:
+            self.shot_cooldown -= 1
+
         self.calculate_astar()
         self.animate(delta_time * ANIMATION_SPEED)
 
@@ -78,6 +92,35 @@ class Enemy(PhysicsSprite):
             self.x_vel = x_speed
 
             self.path.pop(0)
+        elif self.state == SHOOTING and self.shot_cooldown == 0:
+            if self.test_los(self.game_resources.player_sprite, SPRITE_IMAGE_SIZE, self.game_resources.wall_list):
+                self.shot_cooldown = ENEMY_FIRERATE
+                x = (self.center_x, self.game_resources.player_sprite.center_x)
+                y = (self.center_y, self.game_resources.player_sprite.center_y)
+                dir = math.atan2(y[1]-y[0],x[1]-x[0])
+                xv = math.cos(dir) * self.bullet_speed
+                yv = math.sin(dir) * self.bullet_speed
+                self.game_resources.create_bullet((self.center_x,self.center_y), (xv,yv), self.bullet_damage, self.bullet_speed_falloff, self.bullet_damage_falloff)
+
+    def test_los(self, sprite, width, barriers):
+        """
+        Tests to see if the enemy's line of sight on a sprite is obstructed by barriers.
+        "Width" refers to the width of an opening required to confirm line of sight.
+        """
+        x = (self.center_x, sprite.center_x)
+        y = (self.center_y, sprite.center_y)
+        dir = math.atan2(y[1]-y[0],x[1]-x[0])
+        original_hit_box = self.get_hit_box()
+        hit_box = ((x[0] + (math.cos(dir+(math.pi/2)) * width/2), y[0] + (math.sin(dir+(math.pi/2)) * width/2)),
+                   (x[0] + (math.cos(dir-(math.pi/2)) * width/2), y[0] + (math.sin(dir-(math.pi/2)) * width/2)),
+                   (x[1] + (math.cos(dir+(math.pi/2)) * width/2), y[1] + (math.sin(dir+(math.pi/2)) * width/2)),
+                   (x[1] + (math.cos(dir-(math.pi/2)) * width/2), y[1] + (math.sin(dir-(math.pi/2)) * width/2)))
+        self.set_hit_box(hit_box)
+        test = sign(len(arcade.check_for_collision_with_list(self, barriers)))
+        self.set_hit_box(original_hit_box)
+        return not test
+
+
 
     def calculate_astar(self):
         self.path = arcade.astar_calculate_path(

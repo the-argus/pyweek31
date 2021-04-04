@@ -21,6 +21,7 @@ from core.EnemyManager import EnemyManager
 from core.lerp import lerp
 from core.MouseCursor import MouseCursor
 from core.PlayerCharacter import PlayerCharacter
+from core.Bullet import Bullet
 
 
 class GameResources:
@@ -65,9 +66,11 @@ class GameResources:
         self.player_list = arcade.SpriteList()
         self.enemy_list = EnemyManager(self)
         self.gui_list = arcade.SpriteList()
+        self.bullet_list = arcade.SpriteList()
 
         # player
         self.player_sprite = PlayerCharacter(PLAYER_DEFAULT_START, self)
+        self.player_sprite.register_sprite_list(self.player_list)
         self.player_list.append(self.player_sprite)
 
         self.load_level()
@@ -77,6 +80,7 @@ class GameResources:
             self.enemy_list.spawn_enemy()
 
         self.gui_list.append(self.mouse_cursor)
+        self.mouse_cursor.register_sprite_list(self.gui_list)
 
     def on_draw(self):
         # draw all the lists
@@ -84,6 +88,7 @@ class GameResources:
         self.wall_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.player_sprite.on_draw()
         self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        self.bullet_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.enemy_list.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.gui_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         """
@@ -113,6 +118,8 @@ class GameResources:
         self.player_sprite.on_update(delta_time)
         for enemy_sprite in self.enemy_list.enemy_list:
             enemy_sprite.on_update(delta_time)
+        for bullet_sprite in self.bullet_list:
+            bullet_sprite.on_update(delta_time)
 
         # screenshake and camera updates
         if self.shake_remain > 0:
@@ -162,6 +169,11 @@ class GameResources:
                 self.view_bottom + self.shake_y,
                 self.view_bottom + self.shake_y + SCREEN_HEIGHT,
             )
+
+    def create_bullet(self, pos, vel, damage, speed_falloff, damage_falloff):
+        new_bullet = Bullet(pos, vel, damage, speed_falloff, damage_falloff, self.game_instance.physics_engine, self)
+        new_bullet.register_sprite_list(self.bullet_list)
+        self.bullet_list.append(new_bullet)
 
     def calculate_distance_from_player(self, enemy_x, enemy_y):
         player_x = self.player_sprite.center_x

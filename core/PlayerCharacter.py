@@ -116,6 +116,10 @@ class PlayerCharacter(PhysicsSprite):
             self.right_pressed = False
         elif key == arcade.key.SPACE:
             self.activated = False
+            if not self.cooldown and self.jet_burst_tick >= 1:
+                self.jet_burst_tick = -JETPACK_BURST_COOLDOWN
+                self.jet_engaged = False
+                self.cooldown = True
 
     def on_draw(self):
         # draw emitter
@@ -222,8 +226,8 @@ class PlayerCharacter(PhysicsSprite):
                 ** 2
             )
             dist_scale = JETPACK_FORCE * self.jetpack_distance_scaling(mouse_dist)
-            jx_force = math.cos(mouse_dir) * dist_scale
-            jy_force = math.sin(mouse_dir) * dist_scale
+            jx_force = math.cos(mouse_dir) * dist_scale * (self.fuel > 0)
+            jy_force = math.sin(mouse_dir) * dist_scale * (self.fuel > 0)
         else:
             jx_force = 0
             jy_force = 0
