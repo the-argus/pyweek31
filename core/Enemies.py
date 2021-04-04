@@ -55,27 +55,28 @@ class Enemy(PhysicsSprite):
         if self.path:
             self.path.pop(0)
 
-        if len(self.path) > 1:
+        if self.path is not None:
+            if len(self.path) > 1:
 
-            dir = math.atan2(self.path[1][1]-self.center_y, self.path[1][0]-self.center_x)
-            x_speed = math.cos(dir) * ENEMY_SPEED
-            y_speed = math.sin(dir) * ENEMY_SPEED
+                dir = math.atan2(self.path[1][1]-self.center_y, self.path[1][0]-self.center_x)
+                x_speed = math.cos(dir) * ENEMY_SPEED
+                y_speed = math.sin(dir) * ENEMY_SPEED
 
-            """
-            if self.center_x < self.path[1][0]:
-                x_speed = ENEMY_SPEED
-            else:
-                x_speed = -ENEMY_SPEED
-            if self.center_y < self.path[1][1]:
-                y_speed = ENEMY_SPEED
-            else:
-                y_speed = -ENEMY_SPEED
-            """
+                """
+                if self.center_x < self.path[1][0]:
+                    x_speed = ENEMY_SPEED
+                else:
+                    x_speed = -ENEMY_SPEED
+                if self.center_y < self.path[1][1]:
+                    y_speed = ENEMY_SPEED
+                else:
+                    y_speed = -ENEMY_SPEED
+                """
 
-            self.y_vel = y_speed
-            self.x_vel = x_speed
+                self.y_vel = y_speed
+                self.x_vel = x_speed
 
-            self.path.pop(0)
+                self.path.pop(0)
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/enemy_static.png", self.scale)
