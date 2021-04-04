@@ -70,9 +70,5 @@ class GameInstance:
             if sprite is not None:
                 wall = self.physics_engine.move_sprite(sprite, delta_time)
                 if wall is not None:
-                    sprite.bounces += 1
-                    print((sprite.x_vel,sprite.y_vel))
-                    reflection = self.physics_engine.bounce(sprite, wall, (sprite.x_vel, sprite.y_vel), True)
-                    print(reflection)
-                    sprite.x_vel = reflection[0]
-                    sprite.y_vel = reflection[1]
+                    sprite.jank_kill()
+                    print(str(sprite) + " should be dead right now")

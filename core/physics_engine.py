@@ -56,7 +56,9 @@ class PhysicsEngine:
                     test_y += sign(sprite.y_vel)
                 else:
                     test_y += sign(sprite.y_vel)
-                    collided = arcade.check_for_collision_with_list(sprite, self.obstacles)
+                    if collided is not None:
+                        if len(collided) == 0:
+                            collided = arcade.check_for_collision_with_list(sprite, self.obstacles)
                     test_y -= sign(sprite.y_vel)
                     break
             sprite.center_y += test_y
@@ -67,6 +69,10 @@ class PhysicsEngine:
         if collided is not None:
             if len(collided) >= 1:
                 return collided[0]
+            else:
+                return None
+        else:
+            return None
 
     def collision_check(self, sprite, new_x, new_y):
         """

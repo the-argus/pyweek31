@@ -34,7 +34,7 @@ class Enemy(PhysicsSprite):
         # bullet characteristics
         self.bullet_speed = 10
         self.bullet_damage = 1
-        self.bullet_speed_falloff = 0.99
+        self.bullet_speed_falloff = 1
         self.bullet_damage_falloff = 1
 
         self.shot_cooldown = 0
