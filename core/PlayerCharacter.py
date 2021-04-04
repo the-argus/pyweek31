@@ -13,6 +13,7 @@ from constants.game import (
     MAXFUEL,
     SPRITE_IMAGE_SIZE,
     SPRITE_SCALING,
+    ANIMATION_SPEED
 )
 from constants.physics import (
     GRAVITY,
@@ -57,7 +58,7 @@ class PlayerCharacter(PhysicsSprite):
         self.friction = PLAYER_FRICTION
         self.press_force = PLAYER_SPEED
         self.max_extra_speed = 20
-        self.max_speed = 2
+        self.max_speed = 4
 
         self.x_player_vel = 0
         self.y_player_vel = 0
@@ -115,6 +116,10 @@ class PlayerCharacter(PhysicsSprite):
             self.right_pressed = False
         elif key == arcade.key.SPACE:
             self.activated = False
+            if not self.cooldown and self.jet_burst_tick >= 1:
+                self.jet_burst_tick = -JETPACK_BURST_COOLDOWN
+                self.jet_engaged = False
+                self.cooldown = True
 
     def on_draw(self):
         # draw emitter
@@ -150,7 +155,7 @@ class PlayerCharacter(PhysicsSprite):
             self.fuel_changed(1)
 
         # update animation
-        self.animate(delta_time)
+        self.animate(delta_time * ANIMATION_SPEED)
 
         # force from pressing buttons
         in_x = self.right_pressed - self.left_pressed
@@ -221,8 +226,8 @@ class PlayerCharacter(PhysicsSprite):
                 ** 2
             )
             dist_scale = JETPACK_FORCE * self.jetpack_distance_scaling(mouse_dist)
-            jx_force = math.cos(mouse_dir) * dist_scale
-            jy_force = math.sin(mouse_dir) * dist_scale
+            jx_force = math.cos(mouse_dir) * dist_scale * (self.fuel > 0)
+            jy_force = math.sin(mouse_dir) * dist_scale * (self.fuel > 0)
         else:
             jx_force = 0
             jy_force = 0
@@ -332,7 +337,15 @@ class PlayerCharacter(PhysicsSprite):
 
     def load_textures(self):
         self.sprite_base = arcade.Sprite("resources/player_static.png", self.scale)
-        self.idle_textures(["player_static.png", "player_static_alt.png"])
-        self.walk_textures(
-            ["player_static.png", "player_static_alt.png", "player_static_original.png"]
-        )
+        self.idle_textures([
+            "player/player_idle0.png",
+            "player/player_idle1.png",
+            "player/player_idle2.png",
+            "player/player_idle3.png"
+        ])
+        self.walk_textures([
+            "player/player_walk0.png",
+            "player/player_walk1.png",
+            "player/player_walk2.png",
+            "player/player_walk3.png"
+        ])

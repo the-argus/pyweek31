@@ -65,3 +65,10 @@ class GameInstance:
 
         for sprite in self.game_resources.enemy_list.enemy_list:
             self.physics_engine.move_sprite(sprite, delta_time)
+
+        for sprite in self.game_resources.bullet_list:
+            if sprite is not None:
+                wall = self.physics_engine.move_sprite(sprite, delta_time)
+                if wall is not None:
+                    sprite.jank_kill()
+                    print(str(sprite) + " should be dead right now")
