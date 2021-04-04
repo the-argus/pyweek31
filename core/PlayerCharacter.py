@@ -13,6 +13,7 @@ from constants.game import (
     MAXFUEL,
     SPRITE_IMAGE_SIZE,
     SPRITE_SCALING,
+    ANIMATION_SPEED
 )
 from constants.physics import (
     GRAVITY,
@@ -150,7 +151,7 @@ class PlayerCharacter(PhysicsSprite):
             self.fuel_changed(1)
 
         # update animation
-        self.animate(delta_time)
+        self.animate(delta_time * ANIMATION_SPEED)
 
         # force from pressing buttons
         in_x = self.right_pressed - self.left_pressed

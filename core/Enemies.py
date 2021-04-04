@@ -9,6 +9,7 @@ from constants.game import (
     ROOM_WIDTH,
     SPRITE_IMAGE_SIZE,
     SPRITE_SCALING,
+    ANIMATION_SPEED
 )
 from constants.physics import ENEMY_SPEED, PLAYER_MASS
 from core.physics_engine import PhysicsEngine
@@ -51,7 +52,7 @@ class Enemy(PhysicsSprite):
 
     def on_update(self, delta_time):
         self.calculate_astar()
-        self.animate(delta_time)
+        self.animate(delta_time * ANIMATION_SPEED)
 
         if self.path:
             self.path.pop(0)
@@ -122,4 +123,3 @@ class Jetpack(Enemy):
         #     move faster
         # if collision_check(self, 0, 0, self.wall_list):
         #     stun
-

@@ -86,8 +86,10 @@ class GameResources:
         self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.enemy_list.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
         self.gui_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        """
         for enemy in self.enemy_list.enemy_list:
             enemy.draw_path()
+        """
 
     def on_update(self, delta_time):
         # mouse cursor
