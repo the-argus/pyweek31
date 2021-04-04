@@ -150,6 +150,9 @@ class Enemy(PhysicsSprite):
             "enemies/enemy_walk3.png"
         ])
 
+    def jank_kill(self):
+        self.kill()
+
 
 class Default(Enemy):
     def __init__(self, position, game_resources):

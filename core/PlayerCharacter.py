@@ -1,6 +1,7 @@
 import math
 
 import arcade
+import sys
 
 from constants.enemies import ENEMY_BOUNCE, ENEMY_SPRITE_WIDTH
 from constants.game import (
@@ -82,6 +83,11 @@ class PlayerCharacter(PhysicsSprite):
         self.fuel_gen = FUEL_REGENERATION_TIME
         self.jet_burst_tick = 0
         self.jet_engaged = False
+        self.attack_hitbox = arcade.Sprite()
+        self.hitbox_breadth = math.pi/4
+        self.hitbox_length = 100
+        self.hit_dir = 0
+        self.attack_hitbox_points = ()
 
     def on_mouse_motion(self, x, y, dx, dy):
         pass
@@ -128,6 +134,14 @@ class PlayerCharacter(PhysicsSprite):
         # draw heathbar
         self.health.draw_health_bar()
 
+        """
+        if len(self.attack_hitbox_points) >= 3:
+            arcade.draw_triangle_filled(self.attack_hitbox_points[0][0] + self.center_x,self.attack_hitbox_points[0][1] + self.center_y,
+                                        self.attack_hitbox_points[1][0] + self.center_x, self.attack_hitbox_points[1][1] + self.center_y,
+                                        self.attack_hitbox_points[2][0] + self.center_x, self.attack_hitbox_points[2][1] + self.center_y,
+                                        arcade.color.DARK_GREEN)
+        """
+
     def on_update(self, delta_time):
         if self.emitter:
             self.emitter.update()
@@ -140,7 +154,7 @@ class PlayerCharacter(PhysicsSprite):
                 self.jet_engaged = False
                 self.cooldown = True
 
-            self.run_emitter()
+            self.hit_dir = self.run_emitter()
 
         elif self.jet_burst_tick < 0:
             self.jet_burst_tick += 1
@@ -294,6 +308,29 @@ class PlayerCharacter(PhysicsSprite):
         self.x_vel = self.x_player_vel + self.jetpack_x + self.x_vel_extra
         self.y_vel = self.y_player_vel + self.jetpack_y + self.y_vel_extra
 
+        # set attack hitbox
+        if self.mode == JETPACK and self.jet_engaged and self.activated:
+            self.attack_hitbox.center_x = self.center_x
+            self.attack_hitbox.center_y = self.center_y
+
+            point_1_x = 0
+            point_1_y = 0
+            point_2_x = (math.cos(self.hit_dir + self.hitbox_breadth) * self.hitbox_length)
+            point_2_y = (math.sin(self.hit_dir + self.hitbox_breadth) * self.hitbox_length)
+            point_3_x = (math.cos(self.hit_dir - self.hitbox_breadth) * self.hitbox_length)
+            point_3_y = (math.sin(self.hit_dir - self.hitbox_breadth) * self.hitbox_length)
+
+            self.attack_hitbox_points = ((point_1_x,point_1_y),(point_2_x,point_2_y),(point_3_x,point_3_y))
+            self.attack_hitbox.set_hit_box(self.attack_hitbox_points)
+
+            hit_enemies = arcade.check_for_collision_with_list(self.attack_hitbox, self.game_resources.enemy_list.enemy_list)
+            if hit_enemies is not None:
+                if len(hit_enemies) >= 1:
+                    for enemy in hit_enemies:
+                        enemy.jank_kill()
+        if self.health.cur_health <= 0:
+            print("You lost, LOSER!")
+            sys.exit()
         # print(self.position)
 
     def run_emitter(self):
@@ -310,6 +347,7 @@ class PlayerCharacter(PhysicsSprite):
         angle += 180
 
         self.emitter = fire_emitter(self.position, angle)
+        return math.radians(angle)
 
     def clamp_speed(self, xspeed, yspeed, max_speed):
         vec2 = math.sqrt(xspeed ** 2 + yspeed ** 2)
