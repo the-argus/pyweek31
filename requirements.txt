@@ -1,3 +1,8 @@
 arcade==2.5.6
+math
+logging
+array
+time
+random
 black
 isort

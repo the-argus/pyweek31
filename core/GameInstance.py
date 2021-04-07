@@ -40,6 +40,9 @@ class GameInstance:
     def on_draw(self):
         self.game_resources.on_draw()
 
+    def filter_draw(self, **kwargs):
+        self.game_resources.filter_draw(**kwargs)
+
     def on_draw_scene(self):
         pass
 

@@ -83,14 +83,17 @@ class GameResources:
         self.mouse_cursor.register_sprite_list(self.gui_list)
 
     def on_draw(self):
+        pass
+
+    def filter_draw(self, **kwargs):
         # draw all the lists
-        self.floor_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
-        self.wall_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        self.floor_list.draw(**kwargs)
+        self.wall_list.draw(**kwargs)
         self.player_sprite.on_draw()
-        self.player_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
-        self.bullet_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
-        self.enemy_list.enemy_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
-        self.gui_list.draw(filter=(arcade.gl.NEAREST, arcade.gl.NEAREST))
+        self.player_list.draw(**kwargs)
+        self.bullet_list.draw(**kwargs)
+        self.enemy_list.enemy_list.draw(**kwargs)
+        self.gui_list.draw(**kwargs)
         """
         for enemy in self.enemy_list.enemy_list:
             enemy.draw_path()
