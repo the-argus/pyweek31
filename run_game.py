@@ -158,8 +158,8 @@ class GameWindow(arcade.Window):
         self.bloom.power = 1.0
 
         self.tonemap = self.post_processing.add_effect(Tonemap)
-        self.tonemap.threshold = 2.0
-
+        self.tonemap.threshold = 10.0
+        """
         self.chromatic = self.post_processing.add_effect(ChromaticAberration)
         self.chromatic.axial = 1.0
         self.chromatic.distance_scale = 0.003
@@ -168,11 +168,15 @@ class GameWindow(arcade.Window):
         self.greyscale.strength = 0.5
 
         self.split_tone = self.post_processing.add_effect(SplitTone)
+        self.split_tone.shadow_color = (22/256,21/256,24/256)
+        self.split_tone.highlight_color = (227/256,136/256,131/256)
+        self.split_tone.crossover = 0.01
+        """
 
         self.vignette = self.post_processing.add_effect(Vignette)
         self.vignette.inner_distance = 0.1
 
-        self.template = self.post_processing.add_effect(Template)
+        #self.template = self.post_processing.add_effect(Template)
 
         size = self.get_size()
         self.render_target = RenderTarget(self.ctx, size, 'f2')
